@@ -319,6 +319,22 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 
 ---
 
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/data/watchlist.ts` – 6 WatchlistAsset Mock-Einträge (LINK, DOT, MATIC, AVAX, ATOM, LTC) mit iconColor
+- `projekt/src/components/shared/AssetIcon.tsx` – 32px Icon mit PNG-Versuch + farbigem Fallback-Circle + Initials
+- `projekt/src/components/watchlist/WatchlistRow.tsx` – h-12 Row mit Icon, Name/Symbol, Preis, PriceChangeBadge
+- `projekt/src/components/watchlist/WatchlistSection.tsx` – section-Container mit Watchlist-Header + role="list"
+- `projekt/src/App.tsx` – WatchlistSection in rechte Spalte des xl:-Grids eingebunden
+
+### Installierte Dependencies
+- Keine neuen Dependencies
+
+### Offene Punkte / Tech-Debt
+- Coin-PNG-Icons fehlen (kein assets/coins/ Verzeichnis) → AssetIcon zeigt Fallback-Circle; für Showcase-Upgrade: PNGs ablegen
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Tech ✓ → Dev
+- Aktueller Schritt: Dev ✓ → QA

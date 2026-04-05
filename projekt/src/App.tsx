@@ -1,6 +1,7 @@
 import './App.css'
 import { PortfolioSection } from './components/portfolio/PortfolioSection'
 import { ChartSection } from './components/chart/ChartSection'
+import { WatchlistSection } from './components/watchlist/WatchlistSection'
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
         {/* S-01-B + S-01-C: Price Chart + Watchlist (FEAT-2, FEAT-3) */}
         <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
           <ChartSection />
-          {/* S-01-C: Watchlist – implemented in FEAT-3 */}
+          <WatchlistSection />
         </div>
 
         {/* S-01-D: Transaction History (FEAT-4) */}
