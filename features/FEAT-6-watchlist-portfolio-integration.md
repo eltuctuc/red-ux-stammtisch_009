@@ -87,6 +87,78 @@ Die Watchlist abonniert den Portfolio-State (von FEAT-5) aus App.tsx. Bei jeder 
 
 Wenn der Portfolio-State leer ist, sieht die Watchlist exakt aus wie vor FEAT-6 (kein Border, kein Background-Wash). Das ist AC-4.
 
+## 3. Technisches Design
+*Erstellt: 2026-04-05*
+
+### Übersicht
+
+FEAT-6 hat keinen eigenen State — es konsumiert den `portfolioPositions`-State aus FEAT-5 (in `App.tsx`). Einzige eigene Änderungen: `watchlist.ts` Update + Props-Erweiterung in `WatchlistSection` und `WatchlistRow`.
+
+### State-Komplexität
+
+Kein eigener State. Nur Props-Durchleitung von App.tsx → WatchlistSection → WatchlistRow. Kein State Machine erforderlich.
+
+### Externe Daten
+
+Keine. Kein Validation-Overhead.
+
+### Daten-Änderungen
+
+**`projekt/src/data/watchlist.ts`** — LTC wird durch ETH ersetzt:
+
+```
+Vorher: LINK, DOT, MATIC, AVAX, ATOM, LTC
+Nachher: LINK, DOT, MATIC, AVAX, ATOM, ETH
+```
+
+Neuer ETH-Eintrag: `{ symbol: 'ETH', name: 'Ethereum', priceUSD: 2800, change24hPercent: 1.42, iconColor: '#8b5cf6' }`
+
+Der `iconColor`-Wert entspricht dem `ASSET_COLORS.ETH` aus `coinRegistry.ts` für visuelle Konsistenz.
+
+### Daten-Flow
+
+```
+App.tsx
+  portfolioPositions: PortfolioPosition[]  ← FEAT-5 State
+  portfolioSymbols = new Set(positions.map(p => p.symbol))  ← abgeleitet
+  ↓
+WatchlistSection(portfolioSymbols: Set<string>)
+  ↓ für jede Row:
+WatchlistRow(asset, isLast, isInPortfolio: boolean)
+  isInPortfolio = portfolioSymbols.has(asset.symbol)
+```
+
+### Komponenten-Änderungen
+
+**`WatchlistSection.tsx`** (modifiziert):
+- Erhält neuen Prop: `portfolioSymbols: Set<string>`
+- Leitet `isInPortfolio={portfolioSymbols.has(asset.symbol)}` an jede `WatchlistRow` weiter
+
+**`WatchlistRow.tsx`** (modifiziert):
+- Erhält neuen Prop: `isInPortfolio: boolean`
+- Conditional CSS: `isInPortfolio` → fügt `border-l-2 border-green-500 bg-green-500/5` hinzu, passt `px-1` → `pl-[calc(0.25rem-2px)] pr-1` an (kompensiert den 2px Border ohne Layout-Shift)
+- Keine weiteren visuellen Änderungen (kein Badge, kein Text, kein Icon)
+
+**`App.tsx`** (modifiziert):
+- Leitet `portfolioSymbols` als Prop an `WatchlistSection` weiter (bereits im FEAT-5 Tech-Design eingeplant)
+
+### A11y
+
+- Kein neues semantisches Element nötig
+- Die Hervorhebung ist rein visuell — kein Screenreader-spezifisches Markup erforderlich (da Watchlist-Rows keine Aktionen haben und der "im Portfolio"-Status aus den Portfolio-Sections bereits erkennbar ist)
+- Optional `aria-label` auf dem `role="listitem"` ergänzen: `{asset.name} – im Portfolio` wenn `isInPortfolio`. Einfach zu implementieren.
+
+### Dependencies
+
+Keine neuen Pakete.
+
+### Reihenfolge der Implementierung
+
+1. `watchlist.ts` — LTC → ETH
+2. `WatchlistRow` — neuer `isInPortfolio` Prop + konditionelle Klassen
+3. `WatchlistSection` — neuer `portfolioSymbols` Prop, weitergeleitet
+4. `App.tsx` — `portfolioSymbols` ableiten und an WatchlistSection übergeben (bereits in FEAT-5 App.tsx-Update geplant)
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Req ✓ → UX ✓
+- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓

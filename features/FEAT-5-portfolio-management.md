@@ -164,6 +164,153 @@ Per `flows/product-flows.md`:
 - Abbrechen / ESC / Backdrop → Modal schließt, kein State-Change
 - Entfernen → S-01-A aktualisiert sofort
 
+## 3. Technisches Design
+*Erstellt: 2026-04-05*
+
+### Übersicht
+
+FEAT-5 transformiert `PortfolioSection` von einer statischen Anzeige zu einer interaktiven Portfolio-Verwaltung. Der zentrale Portfolio-State zieht nach `App.tsx` und wird per Props nach unten weitergegeben. FEAT-6 konsumiert denselben State.
+
+### State-Komplexität
+
+≥ 2 Muster vorhanden: Modal-Lifecycle + Fokus-Management + Race Condition (Enter + Button-Click). **State Machine via `useReducer` Pflicht.**
+
+```
+States: idle | modal_open
+Events: OPEN_MODAL | CLOSE_MODAL | ADD_POSITION | REMOVE_POSITION
+
+Transitionen:
+  idle + OPEN_MODAL → modal_open
+  modal_open + CLOSE_MODAL → idle  (kein State-Change in positions)
+  modal_open + ADD_POSITION(payload) → idle  (neue Position in positions[])
+  idle + REMOVE_POSITION(id) → idle  (Position aus positions[] entfernt)
+```
+
+Form-Validation läuft als lokaler State in `AddPositionForm` – nicht im globalen Reducer.
+
+### Externe Daten
+
+Keine externen Datenquellen (kein localStorage, kein Backend, kein URL-Param). Kein Validation-Overhead nötig.
+
+### Neue Daten-Schicht
+
+**`projekt/src/data/coinRegistry.ts`** — neue Datei, kanonische Mock-Preise und Metadaten für alle 6 Coins:
+
+| Symbol | Name | mockPrice (USD) | color |
+|--------|------|----------------|-------|
+| BTC | Bitcoin | 85 000 | #f97316 |
+| ETH | Ethereum | 2 800 | #8b5cf6 |
+| SOL | Solana | 180 | #06b6d4 |
+| BNB | BNB Chain | 580 | #eab308 |
+| ADA | Cardano | 0.82 | #3b82f6 |
+| XRP | XRP | 0.58 | #94a3b8 |
+
+Preise konsistent mit bestehenden `portfolioData`-Werten (Menge × Preis = bisheriger `valueUSD`).
+
+**`PortfolioPosition` Interface** (in `coinRegistry.ts` oder eigene Datei):
+
+```
+{ id: string, symbol: string, name: string, color: string,
+  quantity: number, purchasePricePerUnit: number }
+```
+
+`id` = `crypto.randomUUID()` beim Hinzufügen (oder `Date.now().toString()` als Fallback).
+
+**Pre-Seed `INITIAL_POSITIONS`** — in `coinRegistry.ts`:
+
+| Symbol | Menge | Kaufpreis/Einheit | Aktueller Wert | G/V% | Highlight |
+|--------|-------|-------------------|----------------|------|-----------|
+| BTC | 0.842 | $62 000 | $71 570 | +37% | – |
+| ETH | 8.5 | $2 400 | $23 800 | +17% | – |
+| SOL | 82 | $155 | $14 760 | +16% | – |
+| BNB | 18 | $520 | $10 440 | +12% | – |
+| ADA | 3 800 | $0.95 | $3 116 | **−14%** | ✅ rot |
+| XRP | 1 200 | $0.52 | $696 | +12% | – |
+
+ADA ist absichtlich >10% im Minus → macht FEAT-5 AC-4 im Pre-Seed sofort sichtbar.
+
+**`projekt/src/utils/portfolioUtils.ts`** — neue Datei, reine Berechnungsfunktionen:
+
+- `computePositionMetrics(position, registry)` → `{ currentValueUSD, gainLossUSD, gainLossPercent, isLossTen }`
+- `computePortfolioTotals(positions, registry)` → `{ totalValue, totalGainLoss, totalGainLossPercent }`
+- `deriveAssets(positions, registry)` → `Asset[]` (für PortfolioDonut, benötigt `portfolioPercent`)
+
+### Komponenten-Struktur
+
+**`App.tsx`** (modifiziert):
+- Besitzt `portfolioPositions: PortfolioPosition[]` und `isModalOpen: boolean` via `useReducer`
+- Initialisierung: `INITIAL_POSITIONS` als Initial-State
+- Leitet ab: `portfolioSymbols = new Set(portfolioPositions.map(p => p.symbol))` (für FEAT-6)
+- Gibt weiter: `positions`, `onOpenModal`, `onRemovePosition` an `PortfolioSection`
+- Gibt weiter: `portfolioSymbols` an `WatchlistSection`
+- Rendert: `AddPositionModal` (controlled — `isOpen`, `onClose`, `onSubmit`)
+
+**`portfolio/AddPositionModal.tsx`** (neu):
+- Overlay: `fixed inset-0 bg-black/60 z-50 flex items-center justify-center`
+- Dialog: `role="dialog" aria-modal="true" aria-labelledby="modal-title"` 
+- Schließt bei: ESC-Taste, Backdrop-Klick
+- Fokus-Trap: beim Öffnen Fokus auf erstes Feld, beim Schließen Fokus zurück auf Trigger-Button
+- Rendert `AddPositionForm` als Child
+
+**`portfolio/AddPositionForm.tsx`** (neu):
+- Lokaler State: `{ coin: string, quantity: string, purchasePrice: string, errors: {...} }`
+- Felder: Coin-Select (6 Optionen mit Icon + Name), Menge-Input, Kaufpreis-Input
+- Validierung on Submit: Menge > 0 und numerisch, Kaufpreis > 0 und numerisch, Coin ausgewählt
+- Fehleranzeige: `text-red-400 text-sm` unter dem jeweiligen Feld, `border-red-500` am Feld
+- Doppelter Submit-Schutz: `disabled` während Verarbeitung (bei synchronem In-Memory-State minimal, aber sauber)
+
+**`portfolio/PortfolioPositionList.tsx`** (neu, ersetzt `AssetList` in S-01-A):
+- Erhält `positions: PortfolioPosition[]`
+- Rendert `PortfolioEmptyState` wenn `positions.length === 0`
+- Rendert `PortfolioPositionRow` für jede Position
+- `<ul role="list">` Wrapper
+
+**`portfolio/PortfolioPositionRow.tsx`** (neu):
+- Desktop (md+): Coin-Icon + Name | Menge | Kaufpreis | Akt. Wert | G/V USD | G/V % | Trash-Button
+- Mobile (<md): Coin-Icon + Name (Row 1), 3-Spalten-Grid: Kaufpreis | Akt. Wert | G/V (Row 2), Trash-Icon in Row 1
+- >10% Verlust: `bg-red-500/10` auf dem ganzen `<li>`-Element
+- G/V: `text-green-400` positiv, `text-red-400` negativ, `text-slate-400` neutral
+- Trash-Button: `lucide-react Trash2`, `aria-label="{Coin} aus Portfolio entfernen"`, `p-2` für 40px touch target (akzeptabel)
+
+**`portfolio/PortfolioEmptyState.tsx`** (neu):
+- `lucide-react Briefcase` Icon (40px, `text-slate-600`)
+- "Keine Positionen" (slate-400)
+- "Füge deinen ersten Coin hinzu" (slate-500 sm)
+
+**`PortfolioSection.tsx`** (modifiziert):
+- Erhält `positions: PortfolioPosition[]`, `onOpenModal: () => void`, `onRemovePosition: (id: string) => void`
+- Berechnet `totals` via `computePortfolioTotals` aus utils
+- Headline ändert sich: statt "24h G/V" → "Gesamt G/V (seit Kauf)" — realistischer, da wir keine echten 24h-Daten haben
+- `PortfolioDonut` erhält weiterhin `Asset[]` (via `deriveAssets`)
+- `AssetList` wird durch `PortfolioPositionList` ersetzt
+
+**Bestehende Komponenten unverändert:**
+- `PortfolioDonut` — Interface `Asset[]` bleibt, bekommt nur andere Daten
+- `AssetIcon`, `PriceChangeBadge`, alle anderen Sections
+
+### A11y-Architektur
+
+- Modal: `role="dialog"`, `aria-modal="true"`, `aria-labelledby="modal-title"`, Fokus-Trap, ESC-Handler
+- Trash-Buttons: `aria-label="{Name} aus Portfolio entfernen"`
+- Leerzustand: kein `aria-live` nötig (kein asynchrones Update)
+- Positions-Liste: `<ul role="list" aria-label="Portfolio-Positionen">`
+- Submit-Button: `disabled` bei leerem Form (verhindert leere aria-live-Announcements)
+
+### Dependencies
+
+Keine neuen npm-Pakete. Nutzt bestehende:
+- `lucide-react` — `Plus`, `Trash2`, `Briefcase`
+- Tailwind v4 — alle Klassen im bestehenden System
+
+### Reihenfolge der Implementierung
+
+1. `coinRegistry.ts` + `PortfolioPosition` type + `INITIAL_POSITIONS`
+2. `portfolioUtils.ts` (pure functions, kein UI)
+3. `App.tsx` — useReducer, State-Owner
+4. `AddPositionModal` + `AddPositionForm`
+5. `PortfolioPositionRow` + `PortfolioPositionList` + `PortfolioEmptyState`
+6. `PortfolioSection` update (Props-Interface + neue Kinder)
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Req ✓ → UX ✓
+- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓
