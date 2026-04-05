@@ -45,6 +45,48 @@ Die Watchlist verliert ihren künstlichen "nur Beobachtungsliste"-Charakter. Wen
 | Portfolio ist leer (alle Positionen entfernt) | Keine Hervorhebung in der Watchlist |
 | Coin mehrfach im Portfolio (verschiedene Einträge) | Hervorhebung erscheint sobald der Coin mindestens einmal im Portfolio ist |
 
+## 2. UX Entscheidungen
+*Erstellt: 2026-04-05*
+
+### Daten-Overlap-Problem (Kritisch)
+
+Die aktuelle Watchlist (LINK, DOT, MATIC, AVAX, ATOM, LTC) hat **keine Überlappung** mit den Portfolio-Coins (BTC, ETH, SOL, BNB, ADA, XRP). FEAT-6 wäre im Showcase unsichtbar.
+
+**Entscheidung:** LTC wird aus der Watchlist entfernt, ETH wird hinzugefügt.
+
+Begründung: Kai "hat in seiner Watchlist bewusst auch Coins, die er hält, um sie gegen andere zu vergleichen" (FEAT-6 Spec). ETH im Portfolio + ETH in der Watchlist ist der natürlichste Use Case. LTC ist der am wenigsten relevante Coin für das Ziel-Profil.
+
+Watchlist nach Änderung: LINK, DOT, MATIC, AVAX, ATOM, **ETH**
+
+### Highlight-Stil
+
+**Left-Border + Subtiler Hinterground-Wash**
+
+```
+[2px solider grüner Left-Border] + [bg-green-500/5 Hintergrund]
+```
+
+Tailwind-Klassen: `border-l-2 border-green-500 bg-green-500/5`
+
+Begründung:
+- Kein Layout-Shift (border-l ersetzt bestehenden left-padding nicht — es kommt außen dazu, also padding-left leicht anpassen: `pl-[calc(0.75rem-2px)]`)
+- Keine Größenänderung der Rows
+- Keine Textänderungen — visuell eindeutig
+- Konsistent mit dem grünen Farbvokabular (positiv, "im Bestand")
+- Sichtbar ohne hover
+
+### Touch-Target-Prüfung
+
+Watchlist-Rows haben keine interaktiven Elemente (keine Buttons) — keine Touch-Target-Anforderungen für die Hervorhebung selbst.
+
+### Reaktivität
+
+Die Watchlist abonniert den Portfolio-State (von FEAT-5) aus App.tsx. Bei jeder Änderung (Hinzufügen / Entfernen) wird die Liste neu gerendert. Kein lokaler State in WatchlistRow für die Hervorhebung — reine Ableitung aus Props.
+
+### Kein Portfolio → kein visueller Unterschied
+
+Wenn der Portfolio-State leer ist, sieht die Watchlist exakt aus wie vor FEAT-6 (kein Border, kein Background-Wash). Das ist AC-4.
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Req ✓ → UX
+- Aktueller Schritt: Req ✓ → UX ✓
