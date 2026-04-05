@@ -24,7 +24,10 @@ export function formatCurrencyWithSign(value: number): string {
  */
 export function formatPercent(value: number, showSign = true): string {
   const sign = showSign && value > 0 ? '+' : ''
-  return `${sign}${value.toFixed(2)}%`
+  const formatted = value.toFixed(2)
+  // Prevent "-0.00%" display for very small negative values
+  const display = formatted === '-0.00' ? '0.00' : formatted
+  return `${sign}${display}%`
 }
 
 /**

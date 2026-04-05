@@ -381,6 +381,48 @@ Keine neuen – alle Dependencies waren bereits installiert.
 
 ---
 
+---
+
+## 5. QA Ergebnisse
+*2026-04-05*
+*Fix-Schwelle bestätigt: High + Medium (2026-04-05)*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ Gesamtportfoliowert formatiert, prominent, large type
+- [x] AC-2 ✅ G/V absolut + prozentual angezeigt
+- [x] AC-3 ✅ Grün/Rot + Icon (nie Farbe allein)
+- [x] AC-4 ✅ 6 Assets mit Name, Symbol, Menge, Wert, Gewichtung
+- [x] AC-5 ✅ Realistische Mock-Daten (BTC, ETH, SOL, BNB Chain, ADA, XRP)
+- [x] AC-6 ✅ Desktop vollständig sichtbar (xl: = 1280px Breakpoint korrekt)
+- [x] AC-7 ✅ Mobile: Gesamtwert + G/V above-fold, Asset-Liste scrollbar
+
+### Security: kein Risiko – rein statische Daten, kein Input | A11y: WCAG AA erfüllt nach Fixes
+
+### Gefixte Bugs (11)
+- BUG-FEAT1-UX-001-fixed – Breakpoint lg: → xl: (High)
+- BUG-FEAT1-UX-002-fixed – Label text-slate-500 → text-slate-400 (High)
+- BUG-FEAT1-UX-004-fixed – BNB name → "BNB Chain" (High)
+- BUG-FEAT1-QA-001-fixed – formatPercent "-0.00%" Fix (Medium)
+- BUG-FEAT1-QA-002-fixed – "24h"-Label text-slate-400 (Medium)
+- BUG-FEAT1-QA-003-fixed – AssetList ul/li Semantik (Medium)
+- BUG-FEAT1-UX-003-fixed – Donut-Radien 85%/58% (Medium)
+- BUG-FEAT1-UX-005-fixed – Donut-Breakpoint xl: (Medium)
+- BUG-FEAT1-UX-006-fixed – Icon 16px (w-4 h-4) (Medium)
+- BUG-FEAT1-UX-007-fixed – AssetList xl:max-h-none (Medium)
+- BUG-FEAT1-QA-004-fixed – formatQuantity mit symbol-Param (Low)
+
+### Known Issues (unter Fix-Schwelle)
+- BUG-FEAT1-UX-008 – paddingAngle=0, Segmente fließen leicht ineinander (Low)
+- BUG-FEAT1-UX-009 – formatPercent negatives Vorzeichen Edge Case (Low)
+
+### Summary
+- ✅ 7/7 ACs passed | 11 Bugs gefixt | 2 Known Issues (Low)
+
+### Production-Ready
+✅ Ready
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Dev ✓ → QA
+- Aktueller Schritt: QA ✓ → Done

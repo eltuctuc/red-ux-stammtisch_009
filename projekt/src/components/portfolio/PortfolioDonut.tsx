@@ -17,7 +17,8 @@ export function PortfolioDonut({ assets }: PortfolioDonutProps) {
     <div
       role="img"
       aria-label={`Asset-Verteilung: ${ariaLabel}`}
-      className="w-[120px] h-[120px] sm:w-[180px] sm:h-[180px] shrink-0"
+      // FIX UX-001/UX-005: xl: statt sm: – Donut wächst erst wenn das Zwei-Spalten-Layout aktiv ist
+      className="w-[140px] h-[140px] xl:w-[180px] xl:h-[180px] shrink-0"
     >
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
@@ -25,8 +26,11 @@ export function PortfolioDonut({ assets }: PortfolioDonutProps) {
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius="52%"
-            outerRadius="75%"
+            // FIX UX-003: 85%/58% statt 75%/52% – Donut-Ring sichtbar größer
+            // Bei 180px Container: outerRadius=76.5px, innerRadius=52.2px, Ring=24.3px
+            // Bei 140px Container: outerRadius=59.5px, innerRadius=40.6px, Ring=18.9px
+            innerRadius="58%"
+            outerRadius="85%"
             dataKey="portfolioPercent"
             strokeWidth={2}
             stroke="#0f172a"

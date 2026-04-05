@@ -23,7 +23,10 @@
       "Bash(npm install:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(git push:*)"
     ],
     "additionalDirectories": [
       "/Users/enricoreinsdorf/Projekte/ux-stammtisch_009/.claude"

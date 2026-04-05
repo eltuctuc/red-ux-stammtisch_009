@@ -8,8 +8,9 @@ interface AssetListRowProps {
 
 export function AssetListRow({ asset, isLast }: AssetListRowProps) {
   return (
-    <div
-      className={`flex items-center justify-between h-10 ${!isLast ? 'border-b border-slate-800' : ''}`}
+    // FIX QA-003: <li> statt <div> – passt zur <ul> in AssetList
+    <li
+      className={`flex items-center justify-between h-10 list-none ${!isLast ? 'border-b border-slate-800' : ''}`}
     >
       {/* Left: color dot + name/symbol */}
       <div className="flex items-center gap-2 min-w-0">
@@ -19,12 +20,13 @@ export function AssetListRow({ asset, isLast }: AssetListRowProps) {
           aria-hidden
         />
         <div className="min-w-0">
+          {/* Edge case: truncate long names */}
           <span className="text-sm font-semibold text-slate-100 truncate block leading-tight">
-            {/* Edge case: truncate long names */}
             {asset.name}
           </span>
           <span className="text-xs text-slate-400 leading-tight">
-            {formatQuantity(asset.quantity)} {asset.symbol}
+            {/* FIX QA-004: formatQuantity mit symbol-Parameter verwenden */}
+            {formatQuantity(asset.quantity, asset.symbol)}
           </span>
         </div>
       </div>
@@ -38,6 +40,6 @@ export function AssetListRow({ asset, isLast }: AssetListRowProps) {
           {asset.portfolioPercent.toFixed(1)}%
         </span>
       </div>
-    </div>
+    </li>
   )
 }

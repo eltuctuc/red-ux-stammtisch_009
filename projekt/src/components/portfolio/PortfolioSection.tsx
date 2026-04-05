@@ -15,11 +15,13 @@ export function PortfolioSection() {
       aria-label="Portfolio-Übersicht"
       className="bg-slate-900 rounded-xl px-6 py-8 sm:px-8 sm:py-10"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      {/* xl: = 1280px → matches spec "Desktop ≥1280px" */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:items-center">
 
         {/* Left: total value + P&L */}
         <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-3">
+          {/* FIX UX-002 / QA-002: slate-400 (4.9:1) statt slate-500 (3.8:1) */}
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-3">
             Portfolio-Gesamtwert
           </p>
           <p
@@ -31,7 +33,8 @@ export function PortfolioSection() {
 
           {/* P&L row */}
           <div className={`flex items-center gap-2 flex-wrap ${pnlColor}`}>
-            <PnLIcon className="w-5 h-5 shrink-0" aria-hidden />
+            {/* FIX UX-006: w-4 h-4 (16px) statt w-5 h-5 (20px) */}
+            <PnLIcon className="w-4 h-4 shrink-0" aria-hidden />
             <span
               className="text-xl font-medium"
               aria-label={`24h Gewinn/Verlust absolut: ${formatCurrencyWithSign(change24hAbsolute)}`}
@@ -44,12 +47,14 @@ export function PortfolioSection() {
             >
               {formatPercent(change24hPercent)}
             </span>
-            <span className="text-sm text-slate-500 font-normal">24h</span>
+            {/* FIX QA-002: slate-400 statt slate-500 */}
+            <span className="text-sm text-slate-400 font-normal">24h</span>
           </div>
         </div>
 
         {/* Right: donut + asset list */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        {/* FIX UX-001/UX-005: xl:flex-row statt sm:flex-row → Donut-Layout erst bei 1280px */}
+        <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6">
           <PortfolioDonut assets={assets} />
           <AssetList assets={assets} />
         </div>
