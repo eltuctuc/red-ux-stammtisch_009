@@ -44,7 +44,7 @@ export function formatQuantity(value: number, symbol?: string): string {
     // Remove trailing zeros after decimal
     formatted = value.toFixed(3).replace(/\.?0+$/, '')
   } else if (value >= 0.0001) {
-    formatted = value.toFixed(4).replace(/\.?0+$/, '')
+    formatted = value.toFixed(5).replace(/\.?0+$/, '')
   } else {
     formatted = value.toFixed(8).replace(/\.?0+$/, '')
   }

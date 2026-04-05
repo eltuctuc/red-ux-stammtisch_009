@@ -2,6 +2,25 @@
 
 ---
 
+## v0.4.0 *(2026-04-05)*
+
+### Neue Features
+- **FEAT-4 Transaktionshistorie** – 8 Transaktionen mit Kauf/Verkauf-Badges, Dual-Layout (Tabelle Desktop / Karten Mobile), tabular-nums, adaptiver Datumsformatierung
+
+### Bug Fixes (QA-Runde FEAT-4)
+- HTML-Validität: `TransactionRow` in `DesktopTransactionRow` (`<tr>`) und `MobileTransactionCard` (`<div>`) aufgeteilt – invalides `<div>` in `<tbody>` behoben
+- `formatQuantity`: Sub-Milli-Werte (z.B. 0.00034) werden jetzt mit 5 statt 4 Dezimalstellen formatiert – alle signifikanten Stellen erhalten
+- AssetIcon Desktop: 28px → 32px (spec-konform)
+- Spaltenbreiten: Tailwind `w-`-Klassen auf Desktop-Tabellenspalten gesetzt
+
+### Known Issues
+- BUG-FEAT4-QA-003: `isEven`-Prop semantisch falsch benannt (zebra trifft ungerade Indizes) – Low
+- BUG-FEAT4-QA-004: `formatDate` zeigt "Heute" statt "vor 1 Tag" bei diffDays=0 vs. diffDays=1 Grenzfall – Low
+- BUG-FEAT4-UX-002: `tabular-nums` fehlt auf Datum-Zelle der Desktop-Tabelle – Low
+- BUG-FEAT4-UX-004: Dreifaches `aria-label` auf verschachtelten Elementen – Low
+
+---
+
 ## v0.3.0 *(2026-04-05)*
 
 ### Neue Features

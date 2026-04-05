@@ -3,6 +3,12 @@
 
 ---
 
+## Transaktionshistorie *(FEAT-4, 2026-04-05)*
+
+Die Transaktionshistorie vervollständigt das Dashboard mit den letzten 8 Trades (Kauf/Verkauf). Jede Transaktion zeigt Asset, Menge, Preis pro Einheit, Gesamtbetrag und ein adaptiv formatiertes Datum (relativ ≤7 Tage, absolut danach). Käufe und Verkäufe sind durch farbige Badges (grün/rot mit Text) auf einen Blick unterscheidbar. Das Layout wechselt responsiv zwischen einer 6-spaltigen Tabelle auf Desktop (≥768px) und kompakten Karten auf Mobile.
+
+---
+
 ## Watchlist *(FEAT-3, 2026-04-05)*
 
 Die Watchlist-Sektion zeigt 6 beobachtete Kryptowährungen (LINK, DOT, MATIC, AVAX, ATOM, LTC) – ausschließlich Assets die nicht im Portfolio gehalten werden. Jeder Eintrag zeigt ein farbiges Icon, Asset-Name und Symbol, aktuellen Preis sowie die 24h-Änderung farbkodiert (grün/rot/neutral). Das Layout ist rein informational ohne Interaktion, kompakt auf `h-12` (48px) pro Zeile ausgelegt und passt sich auf Augenhöhe mit der danebenstehenden Chart-Sektion ein.

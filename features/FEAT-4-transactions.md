@@ -4,7 +4,8 @@ status: approved
 
 # FEAT-4: Transaktionshistorie
 *Erstellt: 2026-04-05*
-*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical*
+*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical, High, Medium*
+*Fix-Schwelle bestätigt: 2026-04-05*
 
 ## Zusammenfassung
 Eine Liste der letzten 5–10 Mock-Transaktionen (Kauf/Verkauf) mit Datum, Asset, Menge und Betrag. Die Transaktionshistorie vervollständigt das Dashboard als vollständige Portfolio-Ansicht und gibt dem Showcase Tiefe.
@@ -408,6 +409,39 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 ### Offene Punkte / Tech-Debt
 - Keine
 
+## 5. QA Ergebnisse
+*2026-04-05*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ 8 Transaktionen, neueste zuerst
+- [x] AC-2 ✅ Typ, Asset, Menge, Preis/Einheit, Gesamtbetrag, Datum vorhanden
+- [x] AC-3 ✅ Kauf grün / Verkauf rot (Badge mit Text)
+- [x] AC-4 ✅ Datum: relativ ≤7 Tage, absolut >7 Tage
+- [x] AC-5 ✅ Beträge korrekt formatiert
+- [x] AC-6 ✅ Desktop: Tabelle ohne horizontales Scrollen (nach Spaltenbreiten-Fix)
+- [x] AC-7 ✅ Mobile: Karten-Layout ohne Overflow
+- [x] AC-8 ✅ Alle 6 Portfolio-Assets (BTC, ETH, SOL, BNB, ADA, XRP) in Mock-Daten
+
+### Security: Kein Risiko (statische Daten, kein Input) | A11y: Korrekt (aria-label, scope="col", role="list/listitem")
+
+### Offene Bugs (unter Fix-Schwelle)
+- BUG-FEAT4-QA-003 – `isEven`-Prop semantisch falsch benannt (Low)
+- BUG-FEAT4-QA-004 – `formatDate` zeigt "Heute" statt "vor 1 Tag" je nach Tageszeit (Low)
+- BUG-FEAT4-UX-002 – `tabular-nums` fehlt auf Datum-Zelle (Low)
+- BUG-FEAT4-UX-004 – Dreifaches `aria-label` auf verschachtelten Elementen (Low)
+
+### Gefixte Bugs
+- BUG-FEAT4-QA-001 – Invalides HTML: `TransactionRow` in `DesktopTransactionRow` + `MobileTransactionCard` aufgeteilt (High) ✅
+- BUG-FEAT4-QA-002 – `formatQuantity` toFixed(4→5) für korrekte Sub-Milli-Werte (Medium) ✅
+- BUG-FEAT4-UX-001 – AssetIcon Desktop 28px → 32px (Medium) ✅
+- BUG-FEAT4-UX-003 – Spaltenbreiten als Tailwind w-Klassen auf `<td>` gesetzt (Medium) ✅
+
+### Summary
+- ✅ 8 ACs passed | 8 Bugs (0 Critical, 1 High gefixt, 3 Medium gefixt, 4 Low offen)
+
+### Production-Ready
+⚠️ Ready with Known Issues
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Dev ✓ → QA
+- Aktueller Schritt: QA ✓ → Done
