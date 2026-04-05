@@ -18,7 +18,8 @@ function gainLossColor(percent: number): string {
 
 function gainLossSign(value: number): string {
   if (value > 0) return '+'
-  return ''  // negative sign comes from the number itself
+  if (value < 0) return '-'
+  return ''
 }
 
 export function PortfolioPositionRow({ position, isLast, onRemove }: PortfolioPositionRowProps) {
@@ -74,7 +75,7 @@ export function PortfolioPositionRow({ position, isLast, onRemove }: PortfolioPo
         <button
           onClick={() => onRemove(position.id)}
           aria-label={`${position.name} aus Portfolio entfernen`}
-          className="p-2 text-slate-500 hover:text-red-400 transition-colors rounded shrink-0"
+          className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors rounded shrink-0"
         >
           <Trash2 className="w-4 h-4" aria-hidden />
         </button>
@@ -88,13 +89,16 @@ export function PortfolioPositionRow({ position, isLast, onRemove }: PortfolioPo
             <AssetIcon symbol={position.symbol} name={position.name} color={position.color} size={28} />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-slate-100 truncate leading-tight">{position.name}</p>
-              <p className="text-xs text-slate-400 leading-tight">{position.symbol}</p>
+              <p className="text-xs text-slate-400 leading-tight">
+                {position.symbol}
+                <span className="ml-1.5 text-slate-500">{formatQuantity(position.quantity)}</span>
+              </p>
             </div>
           </div>
           <button
             onClick={() => onRemove(position.id)}
             aria-label={`${position.name} aus Portfolio entfernen`}
-            className="p-2 text-slate-500 hover:text-red-400 transition-colors rounded shrink-0"
+            className="p-3 min-w-[44px] min-h-[44px] flex items-center justify-center text-slate-500 hover:text-red-400 transition-colors rounded shrink-0"
           >
             <Trash2 className="w-4 h-4" aria-hidden />
           </button>

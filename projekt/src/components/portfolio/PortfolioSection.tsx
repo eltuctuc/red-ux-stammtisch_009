@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { TrendingUp, TrendingDown, Plus } from 'lucide-react'
 import type { PortfolioPosition } from '@/data/coinRegistry'
 import { computePortfolioTotals, deriveAssets } from '@/utils/portfolioUtils'
@@ -7,11 +8,12 @@ import { PortfolioPositionList } from './PortfolioPositionList'
 
 interface PortfolioSectionProps {
   positions: PortfolioPosition[]
-  onOpenModal: () => void
+  onOpenModal: (ref: React.RefObject<HTMLButtonElement>) => void
   onRemovePosition: (id: string) => void
 }
 
 export function PortfolioSection({ positions, onOpenModal, onRemovePosition }: PortfolioSectionProps) {
+  const addButtonRef = useRef<HTMLButtonElement>(null)
   const totals = computePortfolioTotals(positions)
   const assets = deriveAssets(positions)
 
@@ -81,7 +83,8 @@ export function PortfolioSection({ positions, onOpenModal, onRemovePosition }: P
 
           {/* Add position button */}
           <button
-            onClick={onOpenModal}
+            ref={addButtonRef}
+            onClick={() => onOpenModal(addButtonRef)}
             aria-label="Position zum Portfolio hinzufügen"
             className="mt-3 w-full flex items-center justify-center gap-2 py-2 px-4 text-sm text-slate-400 border border-dashed border-slate-600 rounded-lg hover:border-slate-400 hover:text-slate-200 transition-colors"
           >

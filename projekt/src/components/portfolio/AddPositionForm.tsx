@@ -1,4 +1,4 @@
-import { useState, useId } from 'react'
+import { useState, useId, useRef } from 'react'
 import { COIN_REGISTRY } from '@/data/coinRegistry'
 import type { PortfolioPosition } from '@/data/coinRegistry'
 
@@ -23,6 +23,11 @@ export function AddPositionForm({ onSubmit, onCancel }: AddPositionFormProps) {
   const quantityId = useId()
   const purchasePriceId = useId()
 
+  // BUG-FEAT5-UX-003: Refs für Fokus auf erstes fehlerhaftes Feld
+  const coinSelectRef = useRef<HTMLSelectElement>(null)
+  const quantityInputRef = useRef<HTMLInputElement>(null)
+  const priceInputRef = useRef<HTMLInputElement>(null)
+
   function validate(): FormErrors {
     const errs: FormErrors = {}
     if (!coin) errs.coin = 'Bitte einen Coin auswählen'
@@ -45,6 +50,10 @@ export function AddPositionForm({ onSubmit, onCancel }: AddPositionFormProps) {
     const errs = validate()
     if (Object.keys(errs).length > 0) {
       setErrors(errs)
+      // BUG-FEAT5-UX-003: Fokus auf erstes fehlerhaftes Feld
+      if (errs.coin) coinSelectRef.current?.focus()
+      else if (errs.quantity) quantityInputRef.current?.focus()
+      else if (errs.purchasePrice) priceInputRef.current?.focus()
       return
     }
 
@@ -70,6 +79,7 @@ export function AddPositionForm({ onSubmit, onCancel }: AddPositionFormProps) {
           Coin
         </label>
         <select
+          ref={coinSelectRef}
           id={coinId}
           value={coin}
           onChange={(e) => { setCoin(e.target.value); setErrors((p) => ({ ...p, coin: undefined })) }}
@@ -97,6 +107,7 @@ export function AddPositionForm({ onSubmit, onCancel }: AddPositionFormProps) {
           Menge
         </label>
         <input
+          ref={quantityInputRef}
           id={quantityId}
           type="number"
           min="0"
@@ -121,6 +132,7 @@ export function AddPositionForm({ onSubmit, onCancel }: AddPositionFormProps) {
           Kaufpreis pro Einheit (USD)
         </label>
         <input
+          ref={priceInputRef}
           id={purchasePriceId}
           type="number"
           min="0"

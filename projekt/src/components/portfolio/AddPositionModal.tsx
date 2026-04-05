@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import type { PortfolioPosition } from '@/data/coinRegistry'
 import { AddPositionForm } from './AddPositionForm'
@@ -7,9 +8,11 @@ interface AddPositionModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (position: Omit<PortfolioPosition, 'id'>) => void
+  triggerRef?: React.RefObject<HTMLButtonElement>
+  formKey?: number
 }
 
-export function AddPositionModal({ isOpen, onClose, onSubmit }: AddPositionModalProps) {
+export function AddPositionModal({ isOpen, onClose, onSubmit, triggerRef, formKey }: AddPositionModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
 
   // ESC to close
@@ -22,18 +25,30 @@ export function AddPositionModal({ isOpen, onClose, onSubmit }: AddPositionModal
     return () => window.removeEventListener('keydown', handleKey)
   }, [isOpen, onClose])
 
-  // Trap focus inside modal when open
+  // Focus: first form field (select/input), not the X-button – BUG-FEAT5-QA-002
   useEffect(() => {
     if (!isOpen || !dialogRef.current) return
-    const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    )
-    const first = focusable[0]
-    const last = focusable[focusable.length - 1]
-    first?.focus()
+
+    // Small delay to ensure DOM is ready after render
+    const id = requestAnimationFrame(() => {
+      if (!dialogRef.current) return
+      const firstFormField = dialogRef.current.querySelector<HTMLElement>('select, input')
+      firstFormField?.focus()
+    })
+    return () => cancelAnimationFrame(id)
+  }, [isOpen])
+
+  // Focus trap inside modal when open
+  useEffect(() => {
+    if (!isOpen || !dialogRef.current) return
 
     function handleTab(e: KeyboardEvent) {
-      if (e.key !== 'Tab') return
+      if (e.key !== 'Tab' || !dialogRef.current) return
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
       if (e.shiftKey) {
         if (document.activeElement === first) { e.preventDefault(); last?.focus() }
       } else {
@@ -45,13 +60,19 @@ export function AddPositionModal({ isOpen, onClose, onSubmit }: AddPositionModal
     return () => window.removeEventListener('keydown', handleTab)
   }, [isOpen])
 
+  // Return focus to trigger button when modal closes – BUG-FEAT5-UX-001 / BUG-FEAT5-QA-003
+  useEffect(() => {
+    if (!isOpen && triggerRef?.current) {
+      triggerRef.current.focus()
+    }
+  }, [isOpen, triggerRef])
+
   if (!isOpen) return null
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-      aria-hidden="false"
     >
       <div
         ref={dialogRef}
@@ -74,8 +95,9 @@ export function AddPositionModal({ isOpen, onClose, onSubmit }: AddPositionModal
           </button>
         </div>
 
-        <AddPositionForm onSubmit={onSubmit} onCancel={onClose} />
+        <AddPositionForm key={formKey} onSubmit={onSubmit} onCancel={onClose} />
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
