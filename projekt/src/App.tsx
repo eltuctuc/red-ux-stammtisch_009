@@ -68,7 +68,7 @@ export default function App() {
   const [state, dispatch] = useReducer(appReducer, INITIAL_STATE)
   const [undoToast, setUndoToast] = useState<UndoToast | null>(null)
   const [formKey, setFormKey] = useState(0)
-  const triggerRef = useRef<React.RefObject<HTMLButtonElement> | null>(null)
+  const triggerRef = useRef<React.RefObject<HTMLButtonElement | null> | null>(null)
 
   const portfolioSymbols = new Set(state.positions.map((p) => p.symbol))
 
@@ -106,7 +106,7 @@ export default function App() {
   }, [undoToast])
 
   // BUG-FEAT5-UX-001 + BUG-FEAT5-UX-002: Modal öffnen mit triggerRef + formKey reset
-  function handleOpenModal(ref: React.RefObject<HTMLButtonElement>) {
+  function handleOpenModal(ref: React.RefObject<HTMLButtonElement | null>) {
     triggerRef.current = ref
     setFormKey((k) => k + 1)
     dispatch({ type: 'OPEN_MODAL' })

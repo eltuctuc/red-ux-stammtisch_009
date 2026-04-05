@@ -8,7 +8,7 @@ import { PortfolioPositionList } from './PortfolioPositionList'
 
 interface PortfolioSectionProps {
   positions: PortfolioPosition[]
-  onOpenModal: (ref: React.RefObject<HTMLButtonElement>) => void
+  onOpenModal: (ref: React.RefObject<HTMLButtonElement | null>) => void
   onRemovePosition: (id: string) => void
 }
 

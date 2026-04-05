@@ -8,7 +8,7 @@ interface AddPositionModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (position: Omit<PortfolioPosition, 'id'>) => void
-  triggerRef?: React.RefObject<HTMLButtonElement>
+  triggerRef?: React.RefObject<HTMLButtonElement | null>
   formKey?: number
 }
 
