@@ -1,12 +1,21 @@
-import { TrendingUp, TrendingDown } from 'lucide-react'
-import { portfolioData } from '@/data/portfolio'
+import { TrendingUp, TrendingDown, Plus } from 'lucide-react'
+import type { PortfolioPosition } from '@/data/coinRegistry'
+import { computePortfolioTotals, deriveAssets } from '@/utils/portfolioUtils'
 import { formatCurrency, formatCurrencyWithSign, formatPercent } from '@/utils/format'
 import { PortfolioDonut } from './PortfolioDonut'
-import { AssetList } from './AssetList'
+import { PortfolioPositionList } from './PortfolioPositionList'
 
-export function PortfolioSection() {
-  const { totalValue, change24hAbsolute, change24hPercent, assets } = portfolioData
-  const isGain = change24hAbsolute >= 0
+interface PortfolioSectionProps {
+  positions: PortfolioPosition[]
+  onOpenModal: () => void
+  onRemovePosition: (id: string) => void
+}
+
+export function PortfolioSection({ positions, onOpenModal, onRemovePosition }: PortfolioSectionProps) {
+  const totals = computePortfolioTotals(positions)
+  const assets = deriveAssets(positions)
+
+  const isGain = totals.totalGainLossUSD >= 0
   const pnlColor = isGain ? 'text-green-500' : 'text-red-500'
   const PnLIcon = isGain ? TrendingUp : TrendingDown
 
@@ -15,51 +24,80 @@ export function PortfolioSection() {
       aria-label="Portfolio-Übersicht"
       className="bg-slate-900 rounded-xl px-6 py-8 sm:px-8 sm:py-10"
     >
-      {/* xl: = 1280px → matches spec "Desktop ≥1280px" */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:items-center">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 xl:items-start">
 
-        {/* Left: total value + P&L */}
+        {/* Left: total value + G/V summary + donut */}
         <div>
-          {/* FIX UX-002 / QA-002: slate-400 (4.9:1) statt slate-500 (3.8:1) */}
           <p className="text-xs font-medium uppercase tracking-wider text-slate-400 mb-3">
             Portfolio-Gesamtwert
           </p>
           <p
             className="text-4xl sm:text-5xl font-bold text-slate-50 leading-none mb-4"
-            aria-label={`Portfolio-Gesamtwert: ${formatCurrency(totalValue)}`}
+            aria-label={`Portfolio-Gesamtwert: ${formatCurrency(totals.totalValue)}`}
           >
-            {formatCurrency(totalValue)}
+            {formatCurrency(totals.totalValue)}
           </p>
 
-          {/* P&L row */}
+          {/* G/V seit Kauf */}
           <div className={`flex items-center gap-2 flex-wrap ${pnlColor}`}>
-            {/* FIX UX-006: w-4 h-4 (16px) statt w-5 h-5 (20px) */}
             <PnLIcon className="w-4 h-4 shrink-0" aria-hidden />
             <span
               className="text-xl font-medium"
-              aria-label={`24h Gewinn/Verlust absolut: ${formatCurrencyWithSign(change24hAbsolute)}`}
+              aria-label={`Gewinn/Verlust: ${formatCurrencyWithSign(totals.totalGainLossUSD)}`}
             >
-              {formatCurrencyWithSign(change24hAbsolute)}
+              {formatCurrencyWithSign(totals.totalGainLossUSD)}
             </span>
             <span
               className="text-base font-normal"
-              aria-label={`24h Gewinn/Verlust prozentual: ${formatPercent(change24hPercent)}`}
+              aria-label={`${formatPercent(totals.totalGainLossPercent)}`}
             >
-              {formatPercent(change24hPercent)}
+              {formatPercent(totals.totalGainLossPercent)}
             </span>
-            {/* FIX QA-002: slate-400 statt slate-500 */}
-            <span className="text-sm text-slate-400 font-normal">24h</span>
+            <span className="text-sm text-slate-400 font-normal">seit Kauf</span>
           </div>
+
+          {/* Donut visible below totals on xl */}
+          {assets.length > 0 && (
+            <div className="mt-6 hidden xl:flex justify-start">
+              <PortfolioDonut assets={assets} />
+            </div>
+          )}
         </div>
 
-        {/* Right: donut + asset list */}
-        {/* FIX UX-001/UX-005: xl:flex-row statt sm:flex-row → Donut-Layout erst bei 1280px */}
-        <div className="flex flex-col xl:flex-row items-center xl:items-start gap-6">
-          <PortfolioDonut assets={assets} />
-          <AssetList assets={assets} />
+        {/* Right: position list */}
+        <div>
+          {/* Desktop column headers */}
+          <div className="hidden md:flex items-center gap-2 px-1 pb-1 border-b border-slate-800 mb-0.5">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-36 shrink-0">Coin</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-24 text-right">Menge</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-24 text-right">Kaufpreis</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-24 text-right">Akt. Wert</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-24 text-right">G/V USD</p>
+            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500 w-16 text-right">G/V %</p>
+            <p className="w-8 shrink-0" />
+          </div>
+
+          <PortfolioPositionList positions={positions} onRemove={onRemovePosition} />
+
+          {/* Add position button */}
+          <button
+            onClick={onOpenModal}
+            aria-label="Position zum Portfolio hinzufügen"
+            className="mt-3 w-full flex items-center justify-center gap-2 py-2 px-4 text-sm text-slate-400 border border-dashed border-slate-600 rounded-lg hover:border-slate-400 hover:text-slate-200 transition-colors"
+          >
+            <Plus className="w-4 h-4" aria-hidden />
+            Position hinzufügen
+          </button>
         </div>
 
       </div>
+
+      {/* Donut below on mobile / non-xl */}
+      {assets.length > 0 && (
+        <div className="mt-6 flex justify-center xl:hidden">
+          <PortfolioDonut assets={assets} />
+        </div>
+      )}
     </section>
   )
 }

@@ -6,13 +6,21 @@ import { PriceChangeBadge } from '@/components/shared/PriceChangeBadge'
 interface WatchlistRowProps {
   asset: WatchlistAsset
   isLast: boolean
+  isInPortfolio: boolean
 }
 
-export function WatchlistRow({ asset, isLast }: WatchlistRowProps) {
+export function WatchlistRow({ asset, isLast, isInPortfolio }: WatchlistRowProps) {
+  const borderClass = !isLast ? 'border-b border-slate-800' : ''
+  // FEAT-6: left-border highlight for portfolio coins — no layout shift (border replaces gap)
+  const portfolioClass = isInPortfolio
+    ? 'border-l-2 border-green-500 bg-green-500/5 pl-[2px]'
+    : ''
+
   return (
     <div
       role="listitem"
-      className={`flex items-center justify-between h-12 px-1 ${!isLast ? 'border-b border-slate-800' : ''}`}
+      aria-label={isInPortfolio ? `${asset.name} – im Portfolio` : asset.name}
+      className={`flex items-center justify-between h-12 px-1 ${borderClass} ${portfolioClass}`}
     >
       {/* Left: Icon + Name/Symbol */}
       <div className="flex items-center gap-3 min-w-0">

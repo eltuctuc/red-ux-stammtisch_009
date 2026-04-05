@@ -12,5 +12,5 @@ export const watchlistData: WatchlistAsset[] = [
   { symbol: 'MATIC',name: 'Polygon',    priceUSD:  0.92, change24hPercent:  2.45, iconColor: '#8247e5' },
   { symbol: 'AVAX', name: 'Avalanche',  priceUSD: 38.17, change24hPercent: -0.63, iconColor: '#e84142' },
   { symbol: 'ATOM', name: 'Cosmos',     priceUSD:  9.54, change24hPercent:  1.12, iconColor: '#6f7390' },
-  { symbol: 'LTC',  name: 'Litecoin',   priceUSD: 92.30, change24hPercent: -3.44, iconColor: '#345d9d' },
+  { symbol: 'ETH',  name: 'Ethereum',   priceUSD: 2800,  change24hPercent:  1.42, iconColor: '#8b5cf6' },
 ]

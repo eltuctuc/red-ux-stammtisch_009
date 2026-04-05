@@ -311,6 +311,27 @@ Keine neuen npm-Pakete. Nutzt bestehende:
 5. `PortfolioPositionRow` + `PortfolioPositionList` + `PortfolioEmptyState`
 6. `PortfolioSection` update (Props-Interface + neue Kinder)
 
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/data/coinRegistry.ts` – CoinInfo, PortfolioPosition, COIN_REGISTRY, INITIAL_POSITIONS
+- `projekt/src/utils/portfolioUtils.ts` – computePositionMetrics, computePortfolioTotals, deriveAssets
+- `projekt/src/components/portfolio/AddPositionModal.tsx` – Modal-Overlay, Fokus-Trap, ESC-Handler
+- `projekt/src/components/portfolio/AddPositionForm.tsx` – Formular mit lokaler Validierung
+- `projekt/src/components/portfolio/PortfolioPositionList.tsx` – Positions-Liste mit Empty-State-Fallback
+- `projekt/src/components/portfolio/PortfolioPositionRow.tsx` – Desktop- und Mobile-Layout, G/V, >10%-Rot
+- `projekt/src/components/portfolio/PortfolioEmptyState.tsx` – Leerzustand
+- `projekt/src/components/portfolio/PortfolioSection.tsx` – Refactored auf Props-Interface
+- `projekt/src/App.tsx` – useReducer als State-Owner, portfolioSymbols für FEAT-6
+
+### Installierte Dependencies
+Keine neuen Pakete.
+
+### Offene Punkte / Tech-Debt
+- `AssetList.tsx` und `portfolio.ts` (static data) sind nun ungenutzt – können in einer späteren Cleanup-Runde entfernt werden
+- Chunk size >500kB (Recharts) – bekannte Warnung seit FEAT-2, kein FEAT-5 Thema
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓
+- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓ → Dev ✓

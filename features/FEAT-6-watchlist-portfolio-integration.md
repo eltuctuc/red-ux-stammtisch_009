@@ -159,6 +159,20 @@ Keine neuen Pakete.
 3. `WatchlistSection` — neuer `portfolioSymbols` Prop, weitergeleitet
 4. `App.tsx` — `portfolioSymbols` ableiten und an WatchlistSection übergeben (bereits in FEAT-5 App.tsx-Update geplant)
 
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/data/watchlist.ts` – LTC → ETH (Overlap mit Portfolio sichergestellt)
+- `projekt/src/components/watchlist/WatchlistSection.tsx` – portfolioSymbols Prop, Weitergabe an Rows
+- `projekt/src/components/watchlist/WatchlistRow.tsx` – isInPortfolio Prop + border-l-2 Highlight
+
+### Installierte Dependencies
+Keine neuen Pakete.
+
+### Offene Punkte / Tech-Debt
+Keine.
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓
+- Aktueller Schritt: Req ✓ → UX ✓ → Tech ✓ → Dev ✓
