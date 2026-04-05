@@ -30,9 +30,15 @@ Es gibt keinen klassischen Nutzerproblem-Fit – das Dashboard ist ein Showcase.
 - Login / Authentifizierung
 - Echte API-Anbindung (CoinGecko, Binance, etc.)
 - Wallet-Integration (MetaMask etc.)
-- Portfolio-Bearbeitung durch den User (kein Hinzufügen/Löschen von Assets)
+- Persistenz über Browser-Sessions (kein localStorage, kein Backend)
 - Push-Notifications oder Preis-Alerts
 - Multi-User-Fähigkeit
+
+## Scope-Erweiterung *(2026-04-05)*
+- Portfolio-Verwaltung durch den User: Coins mit Menge und Kaufpreis hinzufügen/entfernen (in-memory React State, kein Persist)
+- Gewinn/Verlust-Anzeige pro Coin (Kaufpreis vs. aktueller Mock-Preis)
+- Visuelles Warnsignal bei Coins mit >10% Verlust
+- Watchlist-Integration: Portfolio-Coins werden in der Watchlist hervorgehoben
 
 ## Erfolgskriterien
 - Das Dashboard wirkt auf den ersten Blick wie ein echtes, produktionsreifes Produkt

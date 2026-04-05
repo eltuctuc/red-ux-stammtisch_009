@@ -37,4 +37,4 @@
 
 ## Namenskonvention
 - Feature-IDs: FEAT-X
-- Nächste freie ID: FEAT-5
+- Nächste freie ID: FEAT-7
