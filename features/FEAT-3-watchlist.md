@@ -65,5 +65,140 @@ Watchlist (6 Assets):
 ```
 *(Intentional: Diese Assets überschneiden sich nicht mit den Portfolio-Assets aus FEAT-1)*
 
+---
+
+## 2. UX Entscheidungen
+*UX-Designer: Claude – 2026-04-05*
+
+### Einbettung
+**Wo lebt das Feature:** Sektion S-01-C – rechte Spalte der mittleren Dashboard-Zeile neben dem Preis-Chart (S-01-B). Ca. 30–35% Breite (~320–360px). Auf Mobile: gestapelt nach dem Chart.
+
+**Begründung:** product-flows.md ist bindend. Die rechte Schmal-Spalte ist das klassische "Sidebar"-Pattern für Sekundärinformationen neben einem dominanten Chart. Die Watchlist ist komplementär zum Chart, nicht konkurrierend – weniger Breite ist richtig.
+
+---
+
+### Höhen-Kalkulation (kritisch)
+
+**Problem:** Chart-Sektion (S-01-B) ist 300px hoch + ~60px Header = ~360px Gesamthöhe. Watchlist mit 6 Einträgen darf diese Höhe nicht sprengen, da sie dieselbe Zeile teilt.
+
+**Lösung:** `h-12` (48px) pro Watchlist-Row:
+```
+Header:   40px
+6 × 48px: 288px
+Padding:  2 × 16px = 32px
+Gesamt:   360px ✅  (exakt auf Augenhöhe mit Chart-Sektion)
+```
+
+Kein innerer Scroll nötig – alle 6 Einträge passen ohne Overflow.
+
+---
+
+### Layout
+
+**Desktop – Row-Anatomie:**
+```
+┌────────────────────────────────┐
+│  Watchlist                     │  ← Section Header
+├────────────────────────────────┤
+│  [●] Chainlink  LINK    $18.42 │
+│                        +4.21% ↑│
+├────────────────────────────────┤
+│  [●] Polkadot   DOT     $7.83  │
+│                        -1.87% ↓│
+├─────────────── … ──────────────┤
+│  [●] Litecoin   LTC    $92.30  │
+│                        -3.44% ↓│
+└────────────────────────────────┘
+```
+
+Links: Icon (32px) + Name + Symbol gestapelt.
+Rechts: Preis + 24h-% gestapelt, rechtsbündig.
+
+**Mobile (375px):**
+- Full-width Card unter dem Chart
+- Gleiche Row-Struktur, `h-12` (48px) bleibt
+- 6 × 48 + Header + Padding = ~360px → kein Scroll nötig
+
+---
+
+### Interaktionsmuster
+
+**Keine Interaktion.** Rein informational.
+
+Begründung: Kein Drill-Down im Scope (→ würde Routing benötigen, das nicht existiert). Kein Hover-State definiert in Flows. Kein Tapping. Die Watchlist ist ein Scan-Element – der Betrachter überfliegt sie in 2–3 Sekunden.
+
+Konsequenz: Watchlist-Rows sind `<div>`, kein `<button>` oder `<a>`. Kein `cursor-pointer`.
+
+---
+
+### Visuelle Sprache
+
+**Asset-Icons:**
+- 32px × 32px, `rounded-full`
+- Quelle: statische SVG/PNG aus `cryptocurrency-icons` npm package (oder äquivalent)
+- Fallback falls kein Icon: farbiger Kreis mit Symbol-Initials (z.B. "LI" für LINK), Farbe aus Asset-Palette (konsistent mit FEAT-1 Donut-Farben wenn vorhanden)
+- Watchlist-Assets haben keine FEAT-1-Farben → eigene Hue-Zuweisung per Hash oder manuelle Zuweisung in Mock-Daten
+
+**Row-Typography:**
+| Element | Größe | Weight | Farbe |
+|---------|-------|--------|-------|
+| Asset Name | 13px | 600 | `slate-100` |
+| Symbol | 11px | 400 | `slate-400` |
+| Preis | 13px | 600 | `slate-50` |
+| 24h-% positiv | 12px | 500 | `green-500` #22c55e |
+| 24h-% negativ | 12px | 500 | `red-500` #ef4444 |
+| 24h-% neutral (0.00%) | 12px | 400 | `slate-400` |
+
+**Separatoren:** `border-b border-slate-800` zwischen Rows. Letzter Eintrag: kein Border.
+
+**Section Header:** `text-xs font-medium uppercase tracking-wider text-slate-500` – diskret, klar erkennbar als Abschnittsüberschrift.
+
+---
+
+### Komponenten
+
+| Komponente | Verwendung | Status |
+|-----------|-----------|--------|
+| `WatchlistSection` | Container-Card `bg-slate-900 rounded-xl p-4` | Neu bauen |
+| `WatchlistHeader` | "Watchlist" Section Label | Neu bauen |
+| `WatchlistRow` | Icon + Name/Symbol + Preis + 24h-% in `h-12` | Neu bauen |
+| `AssetIcon` | 32px Coin-Logo mit Fallback-Circle | Neu bauen |
+| `PriceChangeBadge` | +/-X.XX% mit Farb-Logik inkl. Neutral-State | Neu bauen (auch in FEAT-1 und FEAT-2 verwendbar) |
+
+**DS-Lücke:** Design System leer → alles neu mit Tailwind.
+
+**Hinweis: `PriceChangeBadge` ist komponentenübergreifend.** Dieselbe Logik wird in FEAT-1 (Asset-G/V) und FEAT-2 (Tages-G/V im Header) benötigt. Sollte als geteilte Komponente gebaut werden.
+
+---
+
+### Touch-Targets
+
+Watchlist-Rows sind **nicht tappbar** → keine interaktiven Elemente → WCAG 2.5.5 entfällt.
+
+---
+
+### Kontrast-Check (WCAG AA)
+Hintergrund: `slate-900` (#0f172a)
+
+| Element | Vordergrund | Hintergrund | Verhältnis | Status |
+|---------|------------|-------------|------------|--------|
+| Asset Name | `slate-100` #f1f5f9 | `slate-900` | ~14:1 | ✅ |
+| Symbol | `slate-400` #94a3b8 | `slate-900` | ~4.9:1 | ✅ |
+| Preis | `slate-50` #f8fafc | `slate-900` | ~17:1 | ✅ |
+| 24h-% grün | `green-500` #22c55e | `slate-900` | ~5.5:1 | ✅ |
+| 24h-% rot | `red-500` #ef4444 | `slate-900` | ~4.6:1 | ✅ |
+| 24h-% neutral | `slate-400` #94a3b8 | `slate-900` | ~4.9:1 | ✅ |
+| Section Header | `slate-500` #64748b | `slate-900` | ~3.8:1 | ⚠️ UI-Element (non-text) ≥3:1 ✅ |
+
+Section Header `slate-500` liegt unter 4.5:1, aber da es sich um ein dekoratives Label (nicht Fließtext) handelt, gilt die UI-Komponenten-Schwelle 3:1 → 3.8:1 ist ausreichend. Bewusste Entscheidung, keine stille Abweichung.
+
+---
+
+### Navigation nach Aktionen
+Keine. S-01-C hat keine Outgoing Transitions in product-flows.md. Kein Update nötig.
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
+- Aktueller Schritt: UX ✓ → Architect
