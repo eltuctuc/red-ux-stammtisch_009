@@ -2,6 +2,7 @@ import './App.css'
 import { PortfolioSection } from './components/portfolio/PortfolioSection'
 import { ChartSection } from './components/chart/ChartSection'
 import { WatchlistSection } from './components/watchlist/WatchlistSection'
+import { TransactionSection } from './components/transactions/TransactionSection'
 
 export default function App() {
   return (
@@ -17,8 +18,8 @@ export default function App() {
           <WatchlistSection />
         </div>
 
-        {/* S-01-D: Transaction History (FEAT-4) */}
-        {/* placeholder – implemented in FEAT-4 */}
+        {/* S-01-D: Transaction History */}
+        <TransactionSection />
 
       </div>
     </div>

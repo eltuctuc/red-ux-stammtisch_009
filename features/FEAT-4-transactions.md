@@ -391,6 +391,23 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 
 ---
 
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/data/transactions.ts` – 8 Transaktionen (Kauf/Verkauf), alle Portfolio-Assets aus FEAT-1
+- `projekt/src/components/transactions/TxTypeBadge.tsx` – Kauf/Verkauf Badge (grün/rot, Text + Farbe)
+- `projekt/src/components/transactions/TransactionRow.tsx` – Desktop `<tr>` + Mobile `<div role="listitem">` in einer Komponente
+- `projekt/src/components/transactions/TransactionTable.tsx` – Desktop `<table hidden md:table>` + Mobile `<div md:hidden role="list">`
+- `projekt/src/components/transactions/TransactionSection.tsx` – Container mit Header "Letzte Transaktionen"
+- `projekt/src/App.tsx` – TransactionSection am Ende des Dashboards eingebunden
+
+### Installierte Dependencies
+- Keine neuen Dependencies
+
+### Offene Punkte / Tech-Debt
+- Keine
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Tech ✓ → Dev
+- Aktueller Schritt: Dev ✓ → QA
