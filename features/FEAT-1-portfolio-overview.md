@@ -355,6 +355,32 @@ Scope-Typ: Klickbarer Prototyp → keine Unit-Tests erforderlich. Manuelle Verif
 
 ---
 
+---
+
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/App.tsx` – Dashboard-Shell mit Grid-Layout (alle 4 Sektionen)
+- `projekt/src/App.css` – Boilerplate gecleart
+- `projekt/src/utils/cn.ts` – clsx + tailwind-merge Helper
+- `projekt/src/utils/format.ts` – formatCurrency, formatCurrencyWithSign, formatPercent, formatQuantity, formatDate
+- `projekt/src/data/portfolio.ts` – Mock-Daten + ASSET_COLORS Map
+- `projekt/src/components/shared/PriceChangeBadge.tsx` – Shared Badge (FEAT-2/3 wiederverwendbar)
+- `projekt/src/components/portfolio/PortfolioSection.tsx` – S-01-A Container
+- `projekt/src/components/portfolio/PortfolioDonut.tsx` – Recharts PieChart Donut
+- `projekt/src/components/portfolio/AssetList.tsx` – Container mit 0%-Filter
+- `projekt/src/components/portfolio/AssetListRow.tsx` – Einzelne Asset-Zeile
+
+### Installierte Dependencies
+Keine neuen – alle Dependencies waren bereits installiert.
+
+### Offene Punkte / Tech-Debt
+- `date-fns` noch nicht installiert (wird für FEAT-2 X-Achsen-Formatierung gebraucht)
+- FEAT-2/3/4 Platzhalter in App.tsx noch leer
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Tech ✓ → Dev
+- Aktueller Schritt: Dev ✓ → QA
