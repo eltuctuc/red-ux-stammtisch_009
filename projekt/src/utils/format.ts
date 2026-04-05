@@ -50,6 +50,16 @@ export function formatQuantity(value: number, symbol?: string): string {
 }
 
 /**
+ * Format a compact currency value for chart Y-axis: 84230 → "$84k"
+ */
+export function formatCurrencyCompact(value: number): string {
+  if (value >= 1000) {
+    return '$' + (value / 1000).toFixed(0) + 'k'
+  }
+  return '$' + value.toFixed(0)
+}
+
+/**
  * Format date: ≤7 days ago → relative ("vor 2 Tagen"), else absolute ("28. Mär 2026")
  */
 export function formatDate(isoString: string): string {

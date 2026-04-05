@@ -1,5 +1,6 @@
 import './App.css'
 import { PortfolioSection } from './components/portfolio/PortfolioSection'
+import { ChartSection } from './components/chart/ChartSection'
 
 export default function App() {
   return (
@@ -10,8 +11,9 @@ export default function App() {
         <PortfolioSection />
 
         {/* S-01-B + S-01-C: Price Chart + Watchlist (FEAT-2, FEAT-3) */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6">
-          {/* placeholders – implemented in FEAT-2 and FEAT-3 */}
+        <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6">
+          <ChartSection />
+          {/* S-01-C: Watchlist – implemented in FEAT-3 */}
         </div>
 
         {/* S-01-D: Transaction History (FEAT-4) */}

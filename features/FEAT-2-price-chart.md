@@ -388,6 +388,25 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 
 ---
 
+## 4. Implementierung
+*2026-04-05*
+
+### Implementierte Dateien
+- `projekt/src/data/chartData.ts` – BTC Mock-Daten für alle 4 Zeiträume (1T/1W/1M/1J) + btcAssetInfo
+- `projekt/src/components/chart/ChartSection.tsx` – Container mit `useState<TimeRange>('1M')`, Trend-Farblogik
+- `projekt/src/components/chart/ChartHeader.tsx` – Asset-Name, Symbol, Preis, Tages-G/V (nutzt PriceChangeBadge)
+- `projekt/src/components/chart/TimeRangeSelector.tsx` – 4 Toggle-Buttons mit aria-pressed
+- `projekt/src/components/chart/PriceAreaChart.tsx` – Recharts AreaChart, Gradient, X/Y-Achsen mit date-fns Formatter
+- `projekt/src/components/chart/ChartTooltip.tsx` – Custom Recharts Tooltip mit Datum + Preis
+- `projekt/src/utils/format.ts` – `formatCurrencyCompact()` ergänzt für Y-Achse
+- `projekt/src/App.tsx` – ChartSection eingebunden, Grid-Breakpoint `lg:` → `xl:` korrigiert
+
+### Installierte Dependencies
+- `date-fns@^4.x` – X-Achsen-Formatierung (HH:mm / Wochentag / dd.MM / Monat)
+
+### Offene Punkte / Tech-Debt
+- Keine
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Tech ✓ → Dev
+- Aktueller Schritt: Dev ✓ → QA
