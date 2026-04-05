@@ -1,0 +1,6 @@
+# Feature Status
+*Zentrale Übersicht – wird von jedem Command automatisch aktualisiert*
+
+| ID | Feature | UX | Tech | Dev | QA |
+|----|---------|----|----|-----|-----|
+| FEAT-1 | Portfolio-Übersicht | – | – | – | – |
