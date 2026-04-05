@@ -4,7 +4,8 @@ status: approved
 
 # FEAT-3: Watchlist
 *Erstellt: 2026-04-05*
-*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical*
+*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical, High, Medium*
+*Fix-Schwelle bestätigt: 2026-04-05*
 
 ## Zusammenfassung
 Eine kompakte Liste von bis zu 6 beobachteten Kryptowährungen mit aktuellem Preis und 24h-Performance. Die Watchlist ergänzt die Portfolio-Übersicht um Assets, die der User beobachtet aber nicht zwingend hält.
@@ -335,6 +336,34 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 ### Offene Punkte / Tech-Debt
 - Coin-PNG-Icons fehlen (kein assets/coins/ Verzeichnis) → AssetIcon zeigt Fallback-Circle; für Showcase-Upgrade: PNGs ablegen
 
+## 5. QA Ergebnisse
+*2026-04-05*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ Genau 6 Einträge mit realistischen Mock-Assets
+- [x] AC-2 ✅ Icon, Name, Symbol, Preis, 24h-% vorhanden
+- [x] AC-3 ✅ Positiv grün, negativ rot
+- [x] AC-4 ✅ Alle 6 Assets sind Non-Portfolio-Assets
+- [x] AC-5 ✅ Alle 6 Einträge ohne horizontales Scrollen auf Desktop
+- [x] AC-6 ✅ Mobile: full-width unter Chart, kein Layout-Bruch
+- [x] AC-7 ✅ "Watchlist" Abschnittsüberschrift vorhanden
+
+### Security: Kein Risiko (statische Daten, kein Input) | A11y: Korrekt (role="list/listitem", aria-label, alt-Texte)
+
+### Offene Bugs (unter Fix-Schwelle)
+- BUG-FEAT3-QA-003 – AssetIcon zeigt kurz Broken-Image-Symbol vor Fallback-Render (Low)
+- BUG-FEAT3-UX-002 – PriceChangeBadge fehlt `showIcon` prop aus Spec (Low)
+
+### Gefixte Bugs
+- BUG-FEAT3-QA-001 / (kein UX-Duplikat) – formatCurrency sub-penny adaptiv (Medium) ✅
+- BUG-FEAT3-QA-002 / UX-001 – PriceChangeBadge aria-label Neutral-Zustand „Neutral" (Medium) ✅
+
+### Summary
+- ✅ 7 ACs passed | 4 Bugs (0 Critical, 0 High, 2 Medium gefixt, 2 Low offen)
+
+### Production-Ready
+⚠️ Ready with Known Issues
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Dev ✓ → QA
+- Aktueller Schritt: QA ✓ → Done

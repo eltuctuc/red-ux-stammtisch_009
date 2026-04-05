@@ -2,6 +2,21 @@
 
 ---
 
+## v0.3.0 *(2026-04-05)*
+
+### Neue Features
+- **FEAT-3 Watchlist** – 6 Non-Portfolio-Assets (LINK, DOT, MATIC, AVAX, ATOM, LTC) mit farbigen Fallback-Icons, Preis und 24h-Badge
+
+### Bug Fixes (QA-Runde FEAT-3)
+- `formatCurrency`: Sub-Penny-Preise (< $0.01) werden jetzt mit bis zu 6 Dezimalstellen dargestellt statt als $0.00 (shared fix, wirkt auch auf FEAT-4)
+- `PriceChangeBadge`: aria-label im Neutral-Zustand (0.00%) liest jetzt "Neutral 0.00 Prozent" statt " 0.00 Prozent" (führendes Leerzeichen entfernt)
+
+### Known Issues
+- BUG-FEAT3-QA-003: AssetIcon zeigt kurz Broken-Image-Symbol vor Fallback-Render – Low
+- BUG-FEAT3-UX-002: `PriceChangeBadge` fehlt `showIcon` prop aus Spec (API-Hygiene) – Low
+
+---
+
 ## v0.2.0 *(2026-04-05)*
 
 ### Neue Features

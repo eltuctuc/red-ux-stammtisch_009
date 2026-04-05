@@ -28,7 +28,7 @@ export function PriceChangeBadge({ value, size = 'sm', className }: PriceChangeB
         !isPositive && !isNegative && 'text-slate-400',
         className,
       )}
-      aria-label={`${isPositive ? 'Plus' : isNegative ? 'Minus' : ''} ${Math.abs(value).toFixed(2)} Prozent`}
+      aria-label={`${isPositive ? 'Plus' : isNegative ? 'Minus' : 'Neutral'} ${Math.abs(value).toFixed(2)} Prozent`}
     >
       {isPositive && <TrendingUp className="w-3 h-3" aria-hidden />}
       {isNegative && <TrendingDown className="w-3 h-3" aria-hidden />}

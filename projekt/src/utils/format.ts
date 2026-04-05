@@ -1,12 +1,14 @@
 /**
  * Format a number as USD currency: 124382.47 → "$124,382.47"
+ * Sub-penny values (< $0.01) use up to 6 decimal places to avoid "$0.00".
  */
 export function formatCurrency(value: number): string {
+  const maxFractionDigits = value > 0 && value < 0.01 ? 6 : 2
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: maxFractionDigits,
   }).format(value)
 }
 
