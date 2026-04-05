@@ -2,6 +2,37 @@
 status: approved
 ---
 
+## 5. QA Ergebnisse
+*2026-04-05*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ ETH-Row hervorgehoben (border-l-2 border-green-500 bg-green-500/5)
+- [x] AC-2 ✅ Kein Layout-Shift – cn() + pl-[2px] pr-1 korrekt kompensiert (nach Fix QA-001/UX-001)
+- [x] AC-3 ✅ Reaktiv bei Remove – Set-Ableitung aus state.positions
+- [x] AC-4 ✅ Kein Overlap → Watchlist wie vor FEAT-6
+
+### Security: Kein Risiko | A11y: sr-only Portfolio-Hinweis, Briefcase-Icon, kein aria-label-Override
+
+### Gefixte Bugs (5 Medium+High)
+- BUG-FEAT6-QA-001-fixed – Layout-Shift cn()-Fix (High)
+- BUG-FEAT6-QA-002-fixed – TypeScript RefObject<null>-Typ FEAT-5-Regression (Medium)
+- BUG-FEAT6-UX-001-fixed – Symmetrisches Padding pl-[2px] pr-1 (Medium)
+- BUG-FEAT6-UX-002-fixed – aria-label entfernt, sr-only span stattdessen (Medium)
+- BUG-FEAT6-UX-003-fixed – Briefcase-Icon als nicht-farbige Semantik-Hilfe (Medium)
+- BUG-FEAT6-UX-004-fixed – transition-colors duration-200 (Low, mitgefixt)
+
+### Known Issues
+Keine – alle Bugs innerhalb der Fix-Schwelle Medium behoben.
+
+### Summary
+- ✅ 4/4 ACs passed | 6 Bugs gefixt (0 Critical, 1 High, 4 Medium, 1 Low)
+
+### Production-Ready
+✅ Ready
+
+Fix-Schwelle: Medium
+Fix-Schwelle bestätigt: 2026-04-05
+
 # FEAT-6: Watchlist-Portfolio-Integration
 *Erstellt: 2026-04-05*
 *Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical*

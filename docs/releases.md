@@ -2,6 +2,18 @@
 
 ---
 
+## v0.5.1 *(2026-04-05)*
+
+### Bug Fixes (QA-Runde FEAT-6)
+- WatchlistRow: `cn()` + `tailwind-merge` für garantierte Klassen-Auflösung (Layout-Shift-Kompensation korrekt)
+- WatchlistRow: Symmetrisches Padding `pl-[2px] pr-1` statt `px-1 pl-[2px]` bei hervorgehobenen Rows
+- WatchlistRow: `aria-label` entfernt, `sr-only`-Span für Portfolio-Status stattdessen – Preis und Kursänderung für Screenreader wieder sichtbar
+- WatchlistRow: `Briefcase`-Icon als nicht-farbige Semantik-Hilfe ("im Portfolio" nicht nur durch Grün)
+- WatchlistRow: `transition-colors duration-200` – Hervorhebung erscheint/verschwindet mit sanftem Übergang
+- PortfolioSection + AddPositionModal + App: `RefObject<HTMLButtonElement | null>` statt `RefObject<HTMLButtonElement>` – TypeScript Build-Fehler behoben (tsc -b)
+
+---
+
 ## v0.5.0 *(2026-04-05)*
 
 ### Neue Features
