@@ -4,7 +4,8 @@ status: approved
 
 # FEAT-2: Interaktives Preis-Chart
 *Erstellt: 2026-04-05*
-*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical*
+*Scope-Typ: Klickbarer Prototyp – Fix-Schwelle: Critical, High, Medium*
+*Fix-Schwelle bestätigt: 2026-04-05*
 
 ## Zusammenfassung
 Ein interaktives Zeitreihen-Chart für Kryptowährungspreise mit wählbaren Zeiträumen (1T, 1W, 1M, 1J) und Hover-Tooltip. Das Chart ist das zentrale Interaktionselement des Dashboards und muss visuell hochwertig und smooth wirken.
@@ -407,6 +408,35 @@ Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
 ### Offene Punkte / Tech-Debt
 - Keine
 
+## 5. QA Ergebnisse
+*2026-04-05*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ Linienchart mit Gradient-Fill
+- [x] AC-2 ✅ Vier Zeitraum-Buttons, aktiver hervorgehoben
+- [x] AC-3 ✅ Klick wechselt Chart-Daten sofort
+- [x] AC-4 ✅ Tooltip zeigt Datum + Preis (nach Fix QA-001)
+- [x] AC-5 ✅ Y-Achse beginnt nahe am Minimum
+- [x] AC-6 ✅ Responsiv ohne Overflow
+- [x] AC-7 ✅ Asset-Name + Symbol oberhalb erkennbar
+- [x] AC-8 ✅ Mock-Daten realistisch für alle Zeiträume (nach Fix QA-002)
+
+### Security: Kein Risiko (reines Frontend, kein User-Input) | A11y: Basis-konform (role="img", aria-pressed, aria-label)
+
+### Offene Bugs (unter Fix-Schwelle)
+- BUG-FEAT2-QA-003 – XAxis tickCount wirkungslos bei category-type (Low)
+- BUG-FEAT2-QA-004 / UX-002 – aria-label ohne Preis + Zeitraum-Code statt -Label (Low)
+
+### Gefixte Bugs
+- BUG-FEAT2-QA-001 / UX-001 – Tooltip-Datum zeitraumabhängig formatiert (Medium) ✅
+- BUG-FEAT2-QA-002 – 1M-Dateneinbruch behoben (Medium) ✅
+
+### Summary
+- ✅ 8 ACs passed | 4 Bugs (0 Critical, 0 High, 2 Medium gefixt, 2 Low offen)
+
+### Production-Ready
+⚠️ Ready with Known Issues
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: Dev ✓ → QA
+- Aktueller Schritt: QA ✓ → Done

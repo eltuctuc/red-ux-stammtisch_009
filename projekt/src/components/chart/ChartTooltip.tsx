@@ -1,26 +1,24 @@
 import type { TooltipProps } from 'recharts'
 import { formatCurrency } from '../../utils/format'
-
-interface ChartDataPoint {
-  timestamp: string
-  price: number
-}
+import type { TimeRange, ChartDataPoint } from '../../data/chartData'
 
 type CustomTooltipProps = TooltipProps<number, string> & {
   payload?: Array<{ payload: ChartDataPoint; value: number }>
+  activeRange?: TimeRange
 }
 
-export function ChartTooltip({ active, payload }: CustomTooltipProps) {
+export function ChartTooltip({ active, payload, activeRange }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0) return null
 
   const point = payload[0].payload
   const date = new Date(point.timestamp)
+  const showTime = activeRange === '1T'
+
   const formattedDate = new Intl.DateTimeFormat('de-DE', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    ...(showTime ? { hour: '2-digit', minute: '2-digit' } : {}),
   }).format(date)
 
   return (

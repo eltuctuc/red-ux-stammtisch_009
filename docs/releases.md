@@ -2,6 +2,21 @@
 
 ---
 
+## v0.2.0 *(2026-04-05)*
+
+### Neue Features
+- **FEAT-2 Interaktives Preis-Chart** – BTC Area-Chart mit 4 Zeiträumen (1T/1W/1M/1J), dynamischer Trend-Farbe, Gradient-Fill und Hover-Tooltip mit zeitraumgerechter Datumsformatierung
+
+### Bug Fixes (QA-Runde FEAT-2)
+- Tooltip-Format: Uhrzeit nur noch bei 1T-Ansicht (war: immer sichtbar, "um 12:00" bei Tages-/Wochendaten)
+- 1M Mock-Daten: abrupter 5.3%-Einbruch am 30. März korrigiert (war: 1W-Startwert fälschlicherweise übernommen)
+
+### Known Issues
+- BUG-FEAT2-QA-003: XAxis `tickCount={6}` ohne Wirkung bei category-type – Low
+- BUG-FEAT2-QA-004 / UX-002: `aria-label` auf Chart-Container ohne Preis + Zeitraum-Kurzcode statt -Label – Low
+
+---
+
 ## v0.1.0 *(2026-04-05)*
 
 ### Neue Features

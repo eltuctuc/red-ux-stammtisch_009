@@ -73,7 +73,7 @@ export function PriceAreaChart({ data, activeRange, trendColor, isPositive }: Pr
           />
 
           <Tooltip
-            content={<ChartTooltip />}
+            content={<ChartTooltip activeRange={activeRange} />}
             cursor={false}
           />
 
