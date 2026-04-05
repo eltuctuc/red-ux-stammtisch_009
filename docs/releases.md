@@ -2,6 +2,33 @@
 
 ---
 
+## v0.5.0 *(2026-04-05)*
+
+### Neue Features
+- **FEAT-5 Portfolio-Verwaltung** – Coins mit Menge und Kaufpreis hinzufügen/entfernen, G/V pro Position und gesamt, >10%-Verlust-Hervorhebung, Pre-Seed mit 6 Einträgen, Undo-Toast nach Entfernen
+- **FEAT-6 Watchlist-Portfolio-Integration** – Watchlist-Coins, die im Portfolio liegen, werden mit grüner linker Border hervorgehoben (reaktiv auf Portfolio-State)
+
+### Bug Fixes (QA-Runde FEAT-5)
+- G/V USD zeigt korrekt Minuszeichen bei Verlust-Positionen (war: `$494.00` statt `-$494.00`)
+- Modal-Fokus springt beim Öffnen auf Coin-Select statt X-Button
+- Fokus kehrt nach Modal-Schließen korrekt zum Trigger-Button zurück
+- Form-State wird bei jedem Öffnen komplett zurückgesetzt (via `formKey`)
+- Submit-Fehler fokussiert automatisch das erste fehlerhafte Feld
+- Trash-Button Touch-Target auf 44px angehoben (Desktop + Mobile)
+- Undo-Toast 5s nach Entfernen mit "Rückgängig"-Aktion
+- Modal via `createPortal` nach `document.body`, `aria-hidden` auf `#app-root` bei Modal-Öffnen
+- Mobile-Layout zeigt Menge neben Symbol an (AC-3-Fix)
+
+### Known Issues
+- BUG-FEAT5-QA-004: Portfolio-Header zeigt grünes Icon bei G/V = 0 – Low
+- BUG-FEAT5-QA-005: `aria-label` auf `<li>` unterdrückt Werte-Vorlesen für Screenreader – Low
+- BUG-FEAT5-UX-007: "Kaufpreis"-Spaltenheader ohne "/Einheit"-Angabe – Low
+- BUG-FEAT5-UX-008: `aria-label` auf "Position hinzufügen" weicht vom sichtbaren Text ab – Low
+- BUG-FEAT5-UX-010: Kein Animations-Feedback beim Entfernen einer Position – Low
+- BUG-FEAT5-UX-011: "$0.00"-Zustand bei leerem Portfolio wirkt kaputt – Low
+
+---
+
 ## v0.4.0 *(2026-04-05)*
 
 ### Neue Features

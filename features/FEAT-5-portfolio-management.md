@@ -2,6 +2,50 @@
 status: approved
 ---
 
+## 5. QA Ergebnisse
+*2026-04-05*
+
+### Acceptance Criteria Status
+- [x] AC-1 ✅ Position hinzufügen (Coin, Menge, Kaufpreis)
+- [x] AC-2 ✅ Gesamtwert = Summe (Menge × Mock-Preis)
+- [x] AC-3 ✅ Position zeigt Name, Menge, Kaufpreis, Wert, G/V USD, G/V % (nach Fix QA-001 + UX-009)
+- [x] AC-4 ✅ >10% Verlust rot hervorgehoben
+- [x] AC-5 ✅ Position entfernen (mit Undo-Toast)
+- [x] AC-6 ✅ Reaktive Aktualisierung
+- [x] AC-7 ✅ Pre-Seed 6 Einträge
+- [x] AC-8 ✅ Coin-Auswahl BTC, ETH, SOL, BNB, ADA, XRP
+
+### Security: Kein Risiko (kein XSS, kein localStorage, kein Backend) | A11y: Solide – Fokus-Trap, aria-hidden, Fokus-Return, Fokus-auf-Fehlerfeld
+
+### Gefixte Bugs (10 High/Medium)
+- BUG-FEAT5-QA-001-fixed – G/V USD Minuszeichen (High)
+- BUG-FEAT5-QA-002-fixed – Modal-Initialfokus auf Coin-Select (Medium)
+- BUG-FEAT5-QA-003-fixed – Fokus-Return auf Trigger-Button (Medium)
+- BUG-FEAT5-UX-001-fixed – Fokus-Rückgabe nach Modal-Schließen (High)
+- BUG-FEAT5-UX-002-fixed – Formular-State Reset via formKey (High)
+- BUG-FEAT5-UX-003-fixed – Fokus auf erstes fehlerhaftes Feld (Medium)
+- BUG-FEAT5-UX-004-fixed – Trash Touch-Target 44px (Medium)
+- BUG-FEAT5-UX-005-fixed – Undo-Toast 5s nach Entfernen (Medium)
+- BUG-FEAT5-UX-006-fixed – aria-hidden auf #app-root bei Modal, Portal nach body (Medium)
+- BUG-FEAT5-UX-009-fixed – Menge im Mobile-Layout (Medium)
+
+### Known Issues (Low – unter Fix-Schwelle)
+- BUG-FEAT5-QA-004 – Portfolio-Header grün bei G/V = 0 (Low)
+- BUG-FEAT5-QA-005 – aria-label auf li unterdrückt Werte-Vorlesen (Low)
+- BUG-FEAT5-UX-007 – "Kaufpreis"-Header ohne /Einheit-Angabe (Low)
+- BUG-FEAT5-UX-008 – aria-label "Position hinzufügen"-Button weicht vom Label ab (Low)
+- BUG-FEAT5-UX-010 – Kein visuelles Feedback beim Entfernen (Low)
+- BUG-FEAT5-UX-011 – Donut + "$0.00" bei leerem Portfolio (Low)
+
+### Summary
+- ✅ 8 ACs passed | 10 Bugs gefixt (0 Critical, 3 High, 7 Medium) | 6 Known Issues (Low)
+
+### Production-Ready
+⚠️ Ready with Known Issues – 6 Low-Bugs dokumentiert, alle ACs erfüllt
+
+Fix-Schwelle: Medium
+Fix-Schwelle bestätigt: 2026-04-05
+
 
 # FEAT-5: Portfolio-Verwaltung
 *Erstellt: 2026-04-05*

@@ -3,6 +3,12 @@
 
 ---
 
+## Portfolio-Verwaltung + Watchlist-Portfolio-Integration *(FEAT-5 + FEAT-6, 2026-04-05)*
+
+Das Dashboard ermöglicht interaktive Portfolio-Verwaltung: Nutzer können Coins mit Menge und Kaufpreis hinzufügen oder entfernen. Pro Position werden Kaufpreis, aktueller Wert sowie Gewinn/Verlust in USD und Prozent berechnet und angezeigt. Positionen mit mehr als 10% Verlust werden automatisch rot hervorgehoben. Das Hinzufügen erfolgt via fokussiertem Modal mit Fokus-Trap und vollständigem Keyboard-Support; eine Undo-Funktion schützt vor versehentlichem Entfernen. Watchlist-Einträge, deren Coin im Portfolio gehalten wird, erhalten eine grüne Markierung – das Dashboard reagiert reaktiv auf alle Portfolio-Änderungen.
+
+---
+
 ## Transaktionshistorie *(FEAT-4, 2026-04-05)*
 
 Die Transaktionshistorie vervollständigt das Dashboard mit den letzten 8 Trades (Kauf/Verkauf). Jede Transaktion zeigt Asset, Menge, Preis pro Einheit, Gesamtbetrag und ein adaptiv formatiertes Datum (relativ ≤7 Tage, absolut danach). Käufe und Verkäufe sind durch farbige Badges (grün/rot mit Text) auf einen Blick unterscheidbar. Das Layout wechselt responsiv zwischen einer 6-spaltigen Tabelle auf Desktop (≥768px) und kompakten Karten auf Mobile.
