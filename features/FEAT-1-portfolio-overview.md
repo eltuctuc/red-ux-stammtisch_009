@@ -197,6 +197,164 @@ Keine. FEAT-1 löst keine Transitions aus. Flows-Dokument bestätigt: S-01-A hat
 
 ---
 
+---
+
+## 3. Technisches Design
+*Architect: Claude – 2026-04-05*
+
+### Kontext: Globale Dashboard-Architektur
+FEAT-1 ist S-01-A und damit der Einstiegspunkt des einzigen Screens. `App.tsx` definiert das Dashboard-Grid für alle 4 Sektionen.
+
+**Dashboard-Grid (App.tsx):**
+```
+Desktop (≥1280px):
+  max-w-[1440px] mx-auto px-6 py-6 bg-slate-950 min-h-screen space-y-6
+  ├── S-01-A  PortfolioSection      (full-width)
+  ├── div.grid.grid-cols-[2fr_1fr].gap-6
+  │   ├── S-01-B  ChartSection     (65%)
+  │   └── S-01-C  WatchlistSection (35%)
+  └── S-01-D  TransactionSection   (full-width)
+
+Mobile (< 1280px):
+  space-y-4, alle Sektionen full-width gestapelt
+  → grid bricht auf single column: md:grid-cols-[2fr_1fr]
+```
+
+**Globale Shared-Infrastruktur:**
+```
+projekt/src/
+  utils/
+    cn.ts          ← clsx + tailwind-merge Wrapper
+    format.ts      ← formatCurrency, formatPercent, formatQuantity, formatDate
+  components/
+    shared/
+      PriceChangeBadge.tsx   ← Wiederverwendet in FEAT-1, FEAT-2, FEAT-3
+      AssetIcon.tsx          ← Wiederverwendet in FEAT-3, FEAT-4
+  data/
+    portfolio.ts       ← FEAT-1 Mock-Daten
+    chartData.ts       ← FEAT-2 Mock-Daten
+    watchlist.ts       ← FEAT-3 Mock-Daten
+    transactions.ts    ← FEAT-4 Mock-Daten
+```
+
+---
+
+### Komponenten-Struktur
+
+```
+PortfolioSection                  ← S-01-A Container (full-width card)
+  ├── [Left column, ~50%]
+  │   ├── ValueDisplay            ← Gesamtportfoliowert ($124,382.47)
+  │   └── PnLBadge                ← G/V absolut + prozentual + Icon
+  └── [Right column, ~50%]
+      ├── PortfolioDonut          ← Recharts PieChart (statisch, kein Hover)
+      └── AssetList
+          └── AssetListRow × 6   ← Farb-Dot + Symbol + Name + Menge + Wert + %
+```
+
+**Dateipfade:**
+```
+projekt/src/components/portfolio/
+  PortfolioSection.tsx
+  ValueDisplay.tsx
+  PnLBadge.tsx           ← exportiert auch als shared (via re-export oder eigene Datei)
+  PortfolioDonut.tsx
+  AssetListRow.tsx
+  AssetList.tsx
+```
+
+---
+
+### Daten-Modell
+
+**`projekt/src/data/portfolio.ts`:**
+```
+portfolioData:
+  totalValue: number           // 124382.47
+  change24hAbsolute: number    // 3241.18 (positiv = grün, negativ = rot)
+  change24hPercent: number     // 2.68
+
+  assets: Asset[]
+    symbol: string             // "BTC"
+    name: string               // "Bitcoin"
+    quantity: number           // 0.842
+    valueUSD: number           // 71570.00
+    portfolioPercent: number   // 57.5
+    color: string              // "#f97316" (Marken-Farbe für Donut-Segment)
+
+ASSET_COLORS: Record<string, string>
+  // BTC → #f97316, ETH → #8b5cf6, SOL → #06b6d4,
+  // BNB → #eab308, ADA → #3b82f6, XRP → #94a3b8
+  // (Auch von FEAT-3/4 nutzbar für AssetIcon-Fallback-Farben)
+```
+
+---
+
+### State-Komplexität
+Geprüft – kein State. FEAT-1 ist rein presentational. Alle Daten kommen aus statischem Import. Keine Interaktion, kein Event-Handler.
+
+---
+
+### Externe Daten / Validation
+Kein externes Daten-Lesen (kein localStorage, kein API, kein URL-Param). Static TypeScript-Import → TypeScript-Types reichen, keine Runtime-Validation nötig.
+
+---
+
+### Format-Utilities (`projekt/src/utils/format.ts`)
+Zentral für alle 4 Features:
+
+| Funktion | Input | Output | Beispiel |
+|----------|-------|--------|---------|
+| `formatCurrency(n)` | `124382.47` | `"$124,382.47"` | Intl.NumberFormat |
+| `formatCurrencyCompact(n)` | `3241.18` | `"+$3,241.18"` | mit Vorzeichen |
+| `formatPercent(n)` | `2.68` | `"+2.68%"` | mit Vorzeichen, min. 2 Dezimalstellen |
+| `formatQuantity(n, sym)` | `0.842, "BTC"` | `"0.842 BTC"` | max. 8 Dezimalstellen |
+| `formatDate(d)` | `Date` | `"28. Mär 2026"` oder `"vor 2 Tagen"` | FEAT-4 |
+
+`formatPercent` mit ≥2 Dezimalstellen löst Edge Case "0.01% wird nicht auf 0% gerundet".
+
+---
+
+### Recharts-Konfiguration (PortfolioDonut)
+
+- Komponente: `Recharts.PieChart` + `Recharts.Pie`
+- `innerRadius={60}` / `outerRadius={90}` (Desktop) → 180px Außendurchmesser
+- `innerRadius={45}` / `outerRadius={60}` (Mobile) → 120px Außendurchmesser
+- `isAnimationActive={false}` → statischer Donut, kein Einblende-Animation (kein Hover-Interaktion)
+- Kein `Tooltip`, kein `Legend` von Recharts – eigene `AssetList` daneben
+- `dataKey="portfolioPercent"`, `nameKey="symbol"`
+- Assets mit `portfolioPercent === 0` werden vor Übergabe an `<Pie>` gefiltert (Edge Case)
+
+---
+
+### A11y-Architektur
+
+| Element | Maßnahme |
+|---------|---------|
+| Gesamtwert | `aria-label="Portfolio-Gesamtwert: 124.382,47 US-Dollar"` |
+| PnL-Badge | Icon `aria-hidden`, Text screen-reader-lesbar: `"Plus 3.241,18 Dollar, plus 2,68 Prozent"` |
+| Donut-Chart | `role="img"` + `aria-label="Asset-Verteilung: Bitcoin 57.5%, Ethereum 19.1%, ..."` |
+| AssetListRow | Kein `role` nötig – informationale `<div>`-Liste, nicht interaktiv |
+| Farbe nie allein | G/V-Farbe immer mit Pfeil-Icon + Zahl kombiniert |
+
+---
+
+### Dependencies (FEAT-1 spezifisch)
+
+| Dependency | Version | Verwendung |
+|-----------|---------|-----------|
+| `recharts` | ^3.8.1 | PieChart für Donut | bereits installiert |
+| `lucide-react` | ^1.7.0 | TrendingUp / TrendingDown Icon | bereits installiert |
+
+Kein neues npm-Package nötig.
+
+---
+
+### Test-Setup
+Scope-Typ: Klickbarer Prototyp → keine Unit-Tests erforderlich. Manuelle Verifikation gegen Acceptance Criteria ausreichend.
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: UX ✓ → Architect
+- Aktueller Schritt: Tech ✓ → Dev

@@ -215,6 +215,179 @@ Alle 6 Transitions für S-01-B sind in product-flows.md bereits vollständig def
 
 ---
 
+---
+
+## 3. Technisches Design
+*Architect: Claude – 2026-04-05*
+
+### Komponenten-Struktur
+
+```
+ChartSection                     ← S-01-B Container (card, ~65% Breite)
+  ├── ChartHeader                ← Asset-Name + Symbol + Preis + Tages-G/V
+  │   └── PriceChangeBadge       ← shared/PriceChangeBadge (aus FEAT-1)
+  ├── TimeRangeSelector          ← 4 Toggle-Buttons ['1T','1W','1M','1J']
+  └── PriceAreaChart             ← Recharts AreaChart + ResponsiveContainer
+      └── ChartTooltip           ← Custom Recharts Tooltip Component
+```
+
+**Dateipfade:**
+```
+projekt/src/components/chart/
+  ChartSection.tsx
+  ChartHeader.tsx
+  TimeRangeSelector.tsx
+  PriceAreaChart.tsx
+  ChartTooltip.tsx
+```
+
+---
+
+### Daten-Modell
+
+**`projekt/src/data/chartData.ts`:**
+```
+type TimeRange = '1T' | '1W' | '1M' | '1J'
+
+type ChartDataPoint:
+  timestamp: string    // ISO-String oder label (z.B. "2026-03-15T14:00:00")
+  price: number        // 84230.50
+
+btcChartData: Record<TimeRange, ChartDataPoint[]>
+  '1T': 24 Datenpunkte  (stündlich, ±1–3% Intraday-Volatilität)
+  '1W': 7 Datenpunkte   (täglich, ±3–8%)
+  '1M': 30 Datenpunkte  (täglich, Aufwärtstrend erkennbar)
+  '1J': 52 Datenpunkte  (wöchentlich, deutliche Volatilität)
+
+btcAssetInfo:
+  name: "Bitcoin"
+  symbol: "BTC"
+  currentPrice: number     // letzter Datenpunkt von '1T'
+  change24hPercent: number // für ChartHeader
+```
+
+---
+
+### State (ChartSection)
+
+```typescript
+const [activeRange, setActiveRange] = useState<TimeRange>('1M')
+
+// Derived (keine eigenen States):
+const data = btcChartData[activeRange]
+const isPositive = data[data.length - 1].price >= data[0].price
+const trendColor = isPositive ? '#22c55e' : '#f87171'
+const gradientId = 'chartGradient'  // einziger Chart → kein ID-Konflikt
+```
+
+**State-Komplexität geprüft:** 1 useState-Toggle. Kein State Machine nötig (0 von 2+ kritischen Mustern). React re-rendert synchron bei Klick → keine Race Condition zwischen schnellen Klicks.
+
+---
+
+### Recharts-Konfiguration (PriceAreaChart)
+
+```
+ResponsiveContainer width="100%" height={300}  // Desktop
+                              height={200}  // Mobile (Tailwind md: breakpoint)
+
+AreaChart data={data} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}
+
+  defs:
+    linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1"
+      stop offset="5%"   stopColor={trendColor} stopOpacity={0.35}
+      stop offset="95%"  stopColor={trendColor} stopOpacity={0.02}
+
+  XAxis
+    dataKey="timestamp"
+    tickFormatter: kontextabhängig per TimeRange (HH:mm / Wochentag / DD.MM / Monat)
+    interval: "preserveStartEnd" + max 6 Ticks
+    tick: { fill: '#94a3b8', fontSize: 12 }
+    axisLine: false, tickLine: false
+
+  YAxis
+    domain={['dataMin * 0.995', 'dataMax * 1.005']}
+    tickFormatter: (v) => formatCurrencyCompact(v)
+    tick: { fill: '#94a3b8', fontSize: 12 }
+    axisLine: false, tickLine: false
+    width: 80  // Platz für "$84,000"-Labels
+
+  Area
+    type="monotone" dataKey="price"
+    stroke={trendColor} strokeWidth={2}
+    fill="url(#chartGradient)"
+    dot={false}
+    activeDot={{ r: 5, fill: trendColor, strokeWidth: 0 }}
+    isAnimationActive={true} animationDuration={300}
+
+  Tooltip
+    content={<ChartTooltip />}
+    cursor={false}  // kein Crosshair-Overlay
+
+  CartesianGrid
+    strokeDasharray="3 3"
+    stroke="#1e293b"  // slate-800, sehr subtil
+    vertical={false}  // nur horizontale Linien
+```
+
+**ChartTooltip-Komponente:**
+- Props: `active`, `payload`, `label` (Recharts Standard)
+- Rendert: `bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 shadow-lg`
+- Datum: `text-slate-300 text-xs` (slate-300 statt slate-400 – Kontrast-Fix aus UX)
+- Preis: `text-white font-semibold text-sm`
+
+---
+
+### TimeRangeSelector
+
+- 4 `<button>` Elemente in Pill-Container `bg-slate-800 rounded-lg p-1 flex gap-1`
+- Active: `bg-slate-700 text-white rounded-md`
+- Inactive: `text-slate-400 hover:text-slate-200`
+- Größe: `h-8 px-3 text-sm` → **Hinweis:** `h-8` = 32px < 44px. Touch-Target-Lösung: Pill-Container selbst ist groß genug, aber für mobile explizit `h-9` (36px) + `py-2` Wrapper auf Container → effektive Tappfläche ≥44px über padding. Alternativ: `h-11` direkt (aus UX-Entscheidung empfohlen, übernehmen).
+- `aria-pressed={activeRange === range}` auf jedem Button
+- `onClick={() => setActiveRange(range)}`
+
+---
+
+### X-Achse-Formatter
+
+```typescript
+const xAxisFormatter: Record<TimeRange, (value: string) => string> = {
+  '1T': (v) => format(parseISO(v), 'HH:mm'),
+  '1W': (v) => format(parseISO(v), 'EEE', { locale: de }),   // "Mo", "Di"
+  '1M': (v) => format(parseISO(v), 'dd.MM'),
+  '1J': (v) => format(parseISO(v), 'MMM', { locale: de }),   // "Jan"
+}
+```
+**Hinweis:** Kein `date-fns` installiert → entweder installieren (empfohlen, 5kB gzipped) oder manuell mit `Intl.DateTimeFormat` formatieren. Empfehlung: `date-fns` hinzufügen – deckt auch FEAT-4 `formatDate()` ab.
+
+---
+
+### A11y-Architektur
+
+| Element | Maßnahme |
+|---------|---------|
+| TimeRange-Buttons | `aria-pressed={true/false}`, `aria-label="Zeitraum 1 Monat"` |
+| Chart-Container | `role="img"` + `aria-label="BTC Preisverlauf, 1 Monat, aktuell $84,230.50"` – aktualisiert sich mit activeRange |
+| Tooltip | `aria-live="polite"` nicht nötig (hover-only, kein Keyboard-Fokus auf Tooltip) |
+
+---
+
+### Dependencies (FEAT-2 spezifisch)
+
+| Dependency | Version | Verwendung | Status |
+|-----------|---------|-----------|--------|
+| `recharts` | ^3.8.1 | AreaChart, XAxis, YAxis, Tooltip | installiert |
+| `date-fns` | ^4.x | X-Achsen-Formatierung + FEAT-4 Datum | **neu hinzufügen** |
+
+`date-fns` ist der einzige neue Dependency für das gesamte Projekt.
+
+---
+
+### Test-Setup
+Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: UX ✓ → Architect
+- Aktueller Schritt: Tech ✓ → Dev

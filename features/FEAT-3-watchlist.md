@@ -199,6 +199,126 @@ Keine. S-01-C hat keine Outgoing Transitions in product-flows.md. Kein Update n�
 
 ---
 
+---
+
+## 3. Technisches Design
+*Architect: Claude – 2026-04-05*
+
+### Komponenten-Struktur
+
+```
+WatchlistSection                 ← S-01-C Container (card, ~35% Breite)
+  └── WatchlistRow × 6          ← h-12, border-b zwischen Einträgen (außer letztem)
+      ├── AssetIcon              ← shared/AssetIcon (32px)
+      ├── [Name + Symbol Stack]  ← inline, kein eigener Sub-Component
+      └── [Preis + PriceChangeBadge Stack]  ← shared/PriceChangeBadge
+```
+
+**Dateipfade:**
+```
+projekt/src/components/watchlist/
+  WatchlistSection.tsx
+  WatchlistRow.tsx
+projekt/src/components/shared/
+  AssetIcon.tsx          ← neu (auch für FEAT-4)
+  PriceChangeBadge.tsx   ← neu (auch für FEAT-1, FEAT-2)
+```
+
+---
+
+### Daten-Modell
+
+**`projekt/src/data/watchlist.ts`:**
+```
+type WatchlistAsset:
+  symbol: string           // "LINK"
+  name: string             // "Chainlink"
+  priceUSD: number         // 18.42
+  change24hPercent: number // 4.21 (positiv) / -1.87 (negativ)
+  iconColor: string        // Fallback-Farbe für AssetIcon wenn kein PNG
+
+watchlistData: WatchlistAsset[]  // 6 Einträge, fest
+```
+
+---
+
+### Shared: AssetIcon
+
+**`projekt/src/components/shared/AssetIcon.tsx`:**
+
+Strategie: **kein npm-Paket für Coin-Logos** (vermeidet Dependency-Overhead für einen Showcase). Stattdessen:
+
+1. Versucht `src/assets/coins/{symbol.toLowerCase()}.png` zu laden
+2. `onError` Fallback: farbiger `<div>` Kreis mit Initials (z.B. "LI" für LINK)
+3. Fallback-Farbe kommt aus `iconColor` im Daten-Modell (manuell definiert)
+
+```
+Props:
+  symbol: string
+  name: string
+  color: string    // Fallback-Kreisfarbe
+  size?: number    // default 32
+```
+
+Für Showcase-Qualität: 6 PNG-Icons für Watchlist-Assets als statische Assets ablegen (`projekt/src/assets/coins/link.png` etc.) – können von CoinGecko-API heruntergeladen und statisch eingebettet werden.
+
+---
+
+### Shared: PriceChangeBadge
+
+**`projekt/src/components/shared/PriceChangeBadge.tsx`:**
+```
+Props:
+  value: number        // 4.21 oder -1.87 oder 0
+  showIcon?: boolean   // default true (↑/↓ Icon)
+  size?: 'sm' | 'md'  // default 'sm' (12px / 14px)
+
+Logic:
+  value > 0  → green-500, TrendingUp-Icon, "+4.21%"
+  value < 0  → red-500, TrendingDown-Icon, "-1.87%"
+  value === 0 → slate-400, kein Icon, "0.00%"
+```
+
+Gleiche Komponente in FEAT-1 (PnLBadge hat mehr Inhalt, nutzt aber identische Farb-Logik), FEAT-2 (ChartHeader Tages-G/V), FEAT-3 (WatchlistRow).
+
+---
+
+### State-Komplexität
+Geprüft – kein State. Rein presentational. Statischer Import von `watchlistData`.
+
+---
+
+### Externe Daten / Validation
+Statischer TypeScript-Import → keine Runtime-Validation nötig.
+
+---
+
+### A11y-Architektur
+
+| Element | Maßnahme |
+|---------|---------|
+| WatchlistSection | `<section aria-label="Watchlist">` |
+| WatchlistRow | `<div role="listitem">` – kein Button, kein Link |
+| AssetIcon | `alt={name}` auf `<img>`, Fallback-div: `aria-hidden` (redundant zum Text) |
+| PriceChangeBadge | Icon `aria-hidden`, Wert screen-reader-lesbar: `"plus 4,21 Prozent"` |
+
+---
+
+### Dependencies (FEAT-3 spezifisch)
+
+| Dependency | Verwendung | Status |
+|-----------|-----------|--------|
+| `lucide-react` | TrendingUp / TrendingDown Icon in PriceChangeBadge | installiert |
+
+Kein neues Package.
+
+---
+
+### Test-Setup
+Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: UX ✓ → Architect
+- Aktueller Schritt: Tech ✓ → Dev

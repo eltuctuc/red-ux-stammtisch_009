@@ -3,7 +3,7 @@
 
 | ID | Feature | UX | Tech | Dev | QA |
 |----|---------|----|----|-----|-----|
-| FEAT-1 | Portfolio-Übersicht | ✓ | – | – | – |
-| FEAT-2 | Preis-Chart | ✓ | – | – | – |
-| FEAT-3 | Watchlist | ✓ | – | – | – |
-| FEAT-4 | Transaktionshistorie | ✓ | – | – | – |
+| FEAT-1 | Portfolio-Übersicht | ✓ | ✓ | – | – |
+| FEAT-2 | Preis-Chart | ✓ | ✓ | – | – |
+| FEAT-3 | Watchlist | ✓ | ✓ | – | – |
+| FEAT-4 | Transaktionshistorie | ✓ | ✓ | – | – |

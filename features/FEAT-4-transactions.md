@@ -216,6 +216,181 @@ Keine. S-01-D hat keine Outgoing Transitions. Flows-Dokument kein Update nötig.
 
 ---
 
+---
+
+## 3. Technisches Design
+*Architect: Claude – 2026-04-05*
+
+### Komponenten-Struktur
+
+```
+TransactionSection               ← S-01-D Container (full-width card)
+  └── TransactionTable
+      ├── [TableHeader]          ← <thead> mit 6 <th scope="col">
+      └── TransactionRow × 8    ← <tr> Desktop / <div> Mobile
+          ├── TxTypeBadge        ← "Kauf" / "Verkauf" Badge
+          ├── AssetCell          ← shared/AssetIcon + Name + Symbol
+          ├── [Menge-Zelle]      ← formatQuantity()
+          ├── [Preis-Zelle]      ← formatCurrency()
+          ├── [Betrag-Zelle]     ← formatCurrency(), font-semibold
+          └── [Datum-Zelle]      ← formatDate() aus utils
+```
+
+**Dateipfade:**
+```
+projekt/src/components/transactions/
+  TransactionSection.tsx
+  TransactionTable.tsx
+  TransactionRow.tsx
+  TxTypeBadge.tsx
+```
+
+---
+
+### Daten-Modell
+
+**`projekt/src/data/transactions.ts`:**
+```
+type TxType = 'buy' | 'sell'
+
+type Transaction:
+  id: string               // "tx-1" (für React key)
+  type: TxType
+  assetSymbol: string      // "SOL"
+  assetName: string        // "Solana"
+  assetColor: string       // Fallback-Farbe für AssetIcon
+  quantity: number         // 12
+  pricePerUnit: number     // 178.20
+  totalUSD: number         // 2138.40
+  date: string             // ISO: "2026-04-04T10:30:00"
+
+transactionsData: Transaction[]  // 8 Einträge, neueste zuerst
+```
+
+`date` als ISO-String → `formatDate()` in utils entscheidet ≤7 Tage → relativ, sonst absolut.
+
+---
+
+### Dual-Layout-Implementierung
+
+**Desktop (Tabelle):**
+```html
+<table class="w-full">
+  <thead>
+    <tr class="border-b border-slate-700">
+      <th scope="col" class="text-xs uppercase tracking-wider text-slate-500 text-left pb-3">Typ</th>
+      <th scope="col" ...>Asset</th>
+      <th scope="col" class="text-right ...">Menge</th>
+      <th scope="col" class="text-right ...">Preis/Einheit</th>
+      <th scope="col" class="text-right ...">Gesamtbetrag</th>
+      <th scope="col" class="text-right ...">Datum</th>
+    </tr>
+  </thead>
+  <tbody>
+    {transactionsData.map(tx => <TransactionRow key={tx.id} tx={tx} />)}
+  </tbody>
+</table>
+```
+
+**Mobile (Karten via Tailwind):**
+```
+TransactionRow:
+  <tr class="block md:table-row">  ← auf Mobile: block, auf Desktop: table-row
+  <td class="block md:table-cell"> ← gleich für alle cells
+
+  Karten-Layout (block mode):
+    Grid 2-spaltig: [Badge + Asset / Datum] top row
+                    [Menge @ Preis / Betrag] bottom row
+```
+
+**Zebra-Striping:** `even:bg-slate-800/30` direkt auf `<tr>` / mobiler Karten-`<div>`.
+
+---
+
+### TxTypeBadge
+
+```
+Props: type: 'buy' | 'sell'
+
+buy  → "Kauf"    → bg-green-500/10 text-green-400 border-green-500/20
+sell → "Verkauf" → bg-red-500/10   text-red-400   border-red-500/20
+
+Klassen: rounded-md px-2 py-0.5 text-xs font-medium border
+```
+
+---
+
+### formatDate() (`projekt/src/utils/format.ts`)
+
+```typescript
+function formatDate(isoString: string): string {
+  const date = new Date(isoString)
+  const now = new Date()
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000)
+
+  if (diffDays === 0) return 'Heute'
+  if (diffDays === 1) return 'vor 1 Tag'
+  if (diffDays <= 7) return `vor ${diffDays} Tagen`
+
+  // Absolut: "28. Mär 2026"
+  return new Intl.DateTimeFormat('de-DE', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  }).format(date)
+}
+```
+
+Kein `date-fns` für FEAT-4 nötig – `Intl.DateTimeFormat` reicht. `date-fns` nur für FEAT-2 X-Achse.
+
+---
+
+### tabular-nums
+
+Alle numerischen Zellen bekommen `tabular-nums` (Tailwind v4: `font-variant-numeric-tabular`):
+```html
+<td class="tabular-nums text-right text-slate-300 text-sm">
+  {formatCurrency(tx.pricePerUnit)}
+</td>
+```
+
+---
+
+### State-Komplexität
+Geprüft – kein State. Rein presentational. Alle Daten statisch.
+
+---
+
+### Externe Daten / Validation
+Statischer TypeScript-Import → keine Runtime-Validation nötig.
+
+---
+
+### A11y-Architektur
+
+| Element | Maßnahme |
+|---------|---------|
+| `<table>` | `aria-label="Letzte Transaktionen"` |
+| `<th>` | `scope="col"` auf allen Header-Zellen |
+| TxTypeBadge | Text "Kauf" / "Verkauf" immer sichtbar (kein reines Icon) |
+| Datum | Kein `<time>` datetime nötig (Showcase), aber optionaler Zusatz |
+| Mobile-Karten | `role="list"` auf Container, `role="listitem"` auf Karten |
+
+---
+
+### Dependencies (FEAT-4 spezifisch)
+
+| Dependency | Verwendung | Status |
+|-----------|-----------|--------|
+| `lucide-react` | AssetCell nutzt AssetIcon (kein Icon direkt in TransactionRow) | installiert |
+
+Kein neues Package. `date-fns` optional für FEAT-2 (s.o.).
+
+---
+
+### Test-Setup
+Klickbarer Prototyp → keine Unit-Tests. Manuelle Acceptance-Criteria-Prüfung.
+
+---
+
 ## Fortschritt
 - Status: Freigegeben
-- Aktueller Schritt: UX ✓ → Architect
+- Aktueller Schritt: Tech ✓ → Dev
